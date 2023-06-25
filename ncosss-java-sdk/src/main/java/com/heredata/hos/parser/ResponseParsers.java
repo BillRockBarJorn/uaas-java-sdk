@@ -585,11 +585,11 @@ public final class ResponseParsers {
             Element root = getXmlRootElement(responseBody);
 
             String prefix = root.getChild("Prefix").getValue();
-            String mrker = root.getChild("Marker").getValue();
+            String mrker = root.getChild("StartAfter") != null ? root.getChild("StartAfter").getValue() : (root.getChild("Marker") != null ? root.getChild("Marker").getValue() : null);
             String keyCount = root.getChild("KeyCount").getValue();
             String maxKeys = root.getChild("MaxKeys").getValue();
             String isTruncated = root.getChild("IsTruncated").getValue();
-            String delimiter = root.getChild("Delimiter") != null ? root.getChild("Delimiter").getValue() : null;
+            String delimiter = root.getChild("NextStartAfter") != null ? root.getChild("NextStartAfter").getValue() : (root.getChild("NextMarker") != null ? root.getChild("NextMarker").getValue() : null);
             result.setPrefix(prefix);
             result.setDelimiter(delimiter);
             result.setMarker(mrker);

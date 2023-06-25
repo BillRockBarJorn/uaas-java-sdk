@@ -599,6 +599,10 @@ public class HOSDownloadOperation {
                 getObjectRequest.setUnmodifiedSinceConstraint(downloadFileRequest.getUnmodifiedSinceConstraint());
                 getObjectRequest.setRange(downloadPart.start, downloadPart.end);
 
+                if (downloadPart.start == 0L && downloadPart.end == 0L) {
+                    getObjectRequest.setRange(null);
+                }
+
                 String versionId = downloadFileRequest.getVersionId();
                 if (versionId != null) {
                     getObjectRequest.setVersionId(versionId);
@@ -699,7 +703,7 @@ public class HOSDownloadOperation {
         DownloadPart part = new DownloadPart();
         part.index = 0;
         part.start = 0;
-        part.end = -1;
+        part.end = 0;
         part.fileStart = 0;
         parts.add(part);
         return parts;
