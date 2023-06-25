@@ -51,7 +51,7 @@ public final class HOSRequestParameters {
      * 自定义body中xml标签值
      */
     public static final String PREFIX = "prefix";
-    public static final String START_AFTER = "marker";
+    public static final String START_AFTER = "start-after";
     public static final String MAX_KEYS = "max-keys";
     public static final String VERSION_ID_MARKER = "version-id-marker";
     public static final String MAX_UPLOADS = "max-uploads";
@@ -62,6 +62,7 @@ public final class HOSRequestParameters {
     public static final String SEQUENTIAL = "sequential";
     public static final String TAG_KEY = "tag-key";
     public static final String TAG_VALUE = "tag-value";
+    public static final String LIST_TYPE = "list-type";
 
     /**
      * 自定义子资源路径后缀

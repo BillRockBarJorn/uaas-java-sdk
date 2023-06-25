@@ -17,6 +17,8 @@ import com.heredata.hos.model.bucket.BucketVersioningConfiguration;
 import com.heredata.model.VoidResult;
 
 import java.io.ByteArrayInputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -25,11 +27,13 @@ import java.util.Map;
 import static com.heredata.HttpHeaders.CONTENT_TYPE;
 import static com.heredata.comm.HttpConstants.APPLICATION_XML;
 import static com.heredata.hos.comm.HOSRequestParameters.*;
+import static com.heredata.hos.comm.HOSRequestParameters.LIST_TYPE;
 import static com.heredata.hos.parser.RequestMarshallers.*;
 import static com.heredata.hos.parser.ResponseParsers.*;
 import static com.heredata.hos.utils.HOSUtils.ensureBucketNameCreationValid;
 import static com.heredata.hos.utils.HOSUtils.ensureBucketNameValid;
 import static com.heredata.utils.CodingUtils.assertParameterNotNull;
+import static com.heredata.utils.StringUtils.DEFAULT_ENCODING;
 import static com.heredata.utils.StringUtils.stringToByteArray;
 
 /**
@@ -226,7 +230,7 @@ public class HOSBucketOperation extends HOSOperation {
                 .setAccount(credsProvider.getCredentials().getAccount())
                 .setOriginalRequest(listObjectsRequest).build();
 
-        return doOperation(request, listObjectsReponseParser, bucketName, null, true);
+        return doOperation(request, new ListObjectsReponseParser(bucketName), bucketName, null, true);
     }
 
     /**
@@ -541,22 +545,26 @@ public class HOSBucketOperation extends HOSOperation {
 
     private static void populateListObjectsRequestParameters(ListObjectsRequest listObjectsRequest,
                                                              Map<String, String> params) {
+        try {
+            if (listObjectsRequest.getPrefix() != null) {
+                params.put(PREFIX, URLEncoder.encode(listObjectsRequest.getPrefix(), DEFAULT_ENCODING));
+            }
 
-        if (listObjectsRequest.getPrefix() != null) {
-            params.put(PREFIX, listObjectsRequest.getPrefix());
+            if (listObjectsRequest.getStartAfter() != null) {
+                params.put(START_AFTER, listObjectsRequest.getStartAfter());
+            }
+        } catch (UnsupportedEncodingException e) {
+            throw new ClientException(e);
         }
-
-        if (listObjectsRequest.getStartAfter() != null) {
-            params.put(START_AFTER, listObjectsRequest.getStartAfter());
-        }
-
         if (listObjectsRequest.getMaxKeys() != null) {
             params.put(MAX_KEYS, Integer.toString(listObjectsRequest.getMaxKeys()));
         }
 
         if (listObjectsRequest.isVersion()) {
-            params.put(VERSIONS, null);
+            params.put(VERSIONS, listObjectsRequest.getVersionId());
         }
+
+        params.put(LIST_TYPE, "2");
     }
 
     private static void populateListVersionsRequestParameters(ListVersionsRequest listVersionsRequest,

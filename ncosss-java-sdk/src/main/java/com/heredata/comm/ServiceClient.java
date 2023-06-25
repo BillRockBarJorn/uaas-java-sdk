@@ -109,7 +109,8 @@ public abstract class ServiceClient {
                 // Step 2. 构建http请求参数实体   并且将context添加到request中
                 Request httpRequest = buildRequest(request, context);
 
-                LogUtils.getLog().info("requestURL：："+httpRequest.uri);
+                LogUtils.getLog().info("sdk version is" + "1.0.0-RELEASE");
+                LogUtils.getLog().info("requestURL：：" + httpRequest.uri);
                 LogUtils.getLog().info(httpRequest.method);
                 LogUtils.getLog().info(httpRequest.getHeaders());
 

@@ -53,7 +53,6 @@ public final class ResponseParsers {
     public static final GetBucketVersioningResponseParser getBucketVersioningResponseParser = new GetBucketVersioningResponseParser();
     public static final GetBucketPolicyResponseParser getBucketPolicyResponseParser = new GetBucketPolicyResponseParser();
 
-    public static final ListObjectsReponseParser listObjectsReponseParser = new ListObjectsReponseParser();
     public static final ListVersionsReponseParser listVersionsReponseParser = new ListVersionsReponseParser();
     public static final PutObjectReponseParser putObjectReponseParser = new PutObjectReponseParser();
     public static final PutObjectProcessReponseParser putObjectProcessReponseParser = new PutObjectProcessReponseParser();
@@ -238,10 +237,16 @@ public final class ResponseParsers {
 
     public static final class ListObjectsReponseParser implements ResponseParser<ObjectListing> {
 
+        private String bucketName;
+
+        public ListObjectsReponseParser(String bucketName) {
+            this.bucketName = bucketName;
+        }
         @Override
         public ObjectListing parse(ResponseMessage response) throws ResponseParseException {
             try {
                 ObjectListing result = parseListObjects(response.getContent());
+                result.setBucketName(this.bucketName);
                 result.setRequestId(response.getRequestId());
                 return result;
             } finally {

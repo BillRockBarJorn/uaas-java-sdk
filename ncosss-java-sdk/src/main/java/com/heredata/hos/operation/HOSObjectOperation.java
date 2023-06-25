@@ -694,9 +694,9 @@ public class HOSObjectOperation extends HOSOperation {
             }
 
             metadata.setContentLength(toUpload.length());
-            if (metadata.getContentType() == null) {
-                metadata.setContentType(Mimetypes.getInstance().getMimetype(toUpload, key));
-            }
+//            if (metadata.getContentType() == null) {
+//                metadata.setContentType(Mimetypes.getInstance().getMimetype(toUpload, key));
+//            }
 
             try {
                 repeatableInputStream = new RepeatableFileInputStream(toUpload);
@@ -707,9 +707,9 @@ public class HOSObjectOperation extends HOSOperation {
         } else {
             assertTrue(originalInputStream != null, "Please specify input stream or file to upload");
 
-            if (metadata.getContentType() == null) {
-                metadata.setContentType(Mimetypes.getInstance().getMimetype(key));
-            }
+//            if (metadata.getContentType() == null) {
+//                metadata.setContentType(Mimetypes.getInstance().getMimetype(key));
+//            }
 
             try {
                 metadata.setContentLength(originalInputStream.available());

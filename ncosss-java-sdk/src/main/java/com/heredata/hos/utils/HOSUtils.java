@@ -164,11 +164,11 @@ public class HOSUtils {
         }
 
         StringBuffer cannonicalHost = new StringBuffer();
-        if (bucket != null && !isCname && !clientConfig.isSLDEnabled()) {
-            cannonicalHost.append(bucket).append(".").append(host);
-        } else {
+//        if (bucket != null && !isCname && !clientConfig.isSLDEnabled()) {
+//            cannonicalHost.append(bucket).append(".").append(host);
+//        } else {
             cannonicalHost.append(host);
-        }
+//        }
 
         return cannonicalHost.toString();
     }
@@ -191,7 +191,7 @@ public class HOSUtils {
     }
 
     public static String determineResourcePath(String account, String bucket, String key, boolean sldEnabled) {
-        return sldEnabled ? makeResourcePath(account, bucket, key) : makeResourcePath(key);
+        return sldEnabled ? makeResourcePath(account, bucket, key) : makeResourcePath(account, bucket, key);
     }
 
     /**
