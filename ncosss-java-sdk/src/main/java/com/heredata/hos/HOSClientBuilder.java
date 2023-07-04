@@ -1,7 +1,9 @@
 package com.heredata.hos;
 
 import com.heredata.ClientBuilderConfiguration;
+import com.heredata.ClientConfiguration;
 import com.heredata.hos.auth.DefaultCredentialProvider;
+import com.heredata.utils.LogUtils;
 
 
 /**
@@ -20,6 +22,12 @@ public class HOSClientBuilder implements HOSBuilder {
     public HOS build(String endpoint, String account, String accessKey, String secretKey) {
         return new HOSClient(endpoint, getDefaultCredentialProvider(accessKey, secretKey, account),
                 getClientConfiguration());
+    }
+
+    @Override
+    public HOS build(String endpoint, String account, String accessKey, String secretKey, ClientConfiguration clientConfiguration) {
+        return new HOSClient(endpoint, getDefaultCredentialProvider(accessKey, secretKey, account),
+                clientConfiguration);
     }
 
     private static ClientBuilderConfiguration getClientConfiguration() {

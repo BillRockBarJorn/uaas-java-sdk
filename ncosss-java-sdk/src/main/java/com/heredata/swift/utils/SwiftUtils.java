@@ -30,7 +30,7 @@ import static com.heredata.utils.ResourceUtils.urlEncodeKey;
  * @version 1.0.0
  * @createtime 2022/10/27 14:51
  */
-public class SwiftUtils  {
+public class SwiftUtils {
 
     public static final ResourceManager SWIFT_RESOURCE_MANAGER = ResourceManager.getInstance(RESOURCE_NAME_SWIFT);
 
@@ -338,11 +338,11 @@ public class SwiftUtils  {
         }
 
         StringBuffer cannonicalHost = new StringBuffer();
-        if (bucket != null && !isCname && !clientConfig.isSLDEnabled()) {
-            cannonicalHost.append(bucket).append(".").append(host);
-        } else {
-            cannonicalHost.append(host);
-        }
+//        if (bucket != null && !isCname && !clientConfig.isSLDEnabled()) {
+//            cannonicalHost.append(bucket).append(".").append(host);
+//        } else {
+        cannonicalHost.append(host);
+//        }
 
         return cannonicalHost.toString();
     }
