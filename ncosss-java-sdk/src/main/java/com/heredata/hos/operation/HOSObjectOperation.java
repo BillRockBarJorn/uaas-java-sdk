@@ -131,17 +131,16 @@ public class HOSObjectOperation extends HOSOperation {
         assertParameterNotNull(key, "key");
         ensureBucketNameValid(bucketName);
         ensureObjectKeyValid(key);
+        Map<String, String> headers = new HashMap<String, String>();
+        populateGetObjectRequestHeaders(getObjectRequest, headers);
+        Map<String, String> params = new HashMap<String, String>();
+
+        String versionId = getObjectRequest.getVersionId();
+        if (versionId != null) {
+            params.put(HOSRequestParameters.SUBRESOURCE_VRESION_ID, versionId);
+        }
         if (!getObjectRequest.isIncludeInputStream()) {
 
-            Map<String, String> headers = new HashMap<String, String>();
-            populateGetObjectRequestHeaders(getObjectRequest, headers);
-
-            Map<String, String> params = new HashMap<String, String>();
-
-            String versionId = getObjectRequest.getVersionId();
-            if (versionId != null) {
-                params.put(HOSRequestParameters.SUBRESOURCE_VRESION_ID, versionId);
-            }
 
             request = new HOSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(getObjectRequest))
                     .setMethod(HttpMethod.HEAD).setBucket(bucketName).setKey(key).setHeaders(headers)
@@ -149,8 +148,6 @@ public class HOSObjectOperation extends HOSOperation {
                     .setParameters(params).setOriginalRequest(getObjectRequest).build();
         } else {
             // 下面是获取对象详细信息，包含流信息，可进行下载
-            Map<String, String> headers = new HashMap<>();
-            populateGetObjectRequestHeaders(getObjectRequest, headers);
             if (getObjectRequest.getClientSideEncryptionAlgorithm() != null) {
                 assertParameterNotNull(getObjectRequest.getClientSideEncryptionAlgorithm(), "serverSideEncryptionCustomerAlgorithm");
                 assertParameterNotNull(getObjectRequest.getClientSideEncryptionKey(), "serverSideEncryptionCustomerKey");
@@ -162,7 +159,7 @@ public class HOSObjectOperation extends HOSOperation {
 
             request = new HOSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(getObjectRequest))
                     .setMethod(HttpMethod.GET).setBucket(getObjectRequest.getBucketName()).setKey(getObjectRequest.getKey())
-                    .setAccount(credsProvider.getCredentials().getAccount()).setHeaders(headers)
+                    .setAccount(credsProvider.getCredentials().getAccount()).setHeaders(headers).setParameters(params)
                     .setOriginalRequest(getObjectRequest).build();
         }
 

@@ -30,7 +30,7 @@ public class BucketTest extends TestBase {
         HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
         try {
             // 创建请求对象，并且设置创建桶名为"example"的桶
-            CreateBucketRequest createBucketRequest = new CreateBucketRequest("wuzz");
+            CreateBucketRequest createBucketRequest = new CreateBucketRequest("versionbucket");
             VoidResult result = hos.createBucket(createBucketRequest);
             if (result.getResponse().isSuccessful()) {
                 System.out.println("创建成功");
@@ -346,7 +346,7 @@ public class BucketTest extends TestBase {
         BucketVersioningConfiguration bucketVersioningConfiguration = new BucketVersioningConfiguration();
         bucketVersioningConfiguration.setStatus(ENABLED);
         // 创建请求对象
-        SetBucketVersioningRequest setBucketVersioningRequest = new SetBucketVersioningRequest("jdsdk", bucketVersioningConfiguration);
+        SetBucketVersioningRequest setBucketVersioningRequest = new SetBucketVersioningRequest("versionbucket", bucketVersioningConfiguration);
         try {
             // 设置桶生命周期
             VoidResult result = hos.setBucketVersioning(setBucketVersioningRequest);

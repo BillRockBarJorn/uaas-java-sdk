@@ -652,7 +652,7 @@ public final class ResponseParsers {
         try {
             Element root = getXmlRootElement(responseBody);
 
-            boolean shouldSDKDecode = false;
+            boolean shouldSDKDecode = true;
             VersionListing versionListing = new VersionListing();
             versionListing.setBucketName(root.getChildText("Name"));
             versionListing.setMaxKeys(Integer.valueOf(root.getChildText("MaxKeys")));

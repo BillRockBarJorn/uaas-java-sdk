@@ -3,6 +3,7 @@ package com.heredata.hos.operation;
 import com.heredata.comm.HttpMethod;
 import com.heredata.comm.ServiceClient;
 import com.heredata.exception.ClientException;
+import com.heredata.exception.ExceptionFactory;
 import com.heredata.exception.ServiceException;
 import com.heredata.hos.HOSErrorCode;
 import com.heredata.hos.auth.CredentialsProvider;
@@ -572,12 +573,16 @@ public class HOSBucketOperation extends HOSOperation {
 
         params.put(SUBRESOURCE_VRESIONS, null);
 
-        if (listVersionsRequest.getPrefix() != null) {
-            params.put(PREFIX, listVersionsRequest.getPrefix());
-        }
+        try {
+            if (listVersionsRequest.getPrefix() != null) {
+                params.put(PREFIX, URLEncoder.encode(listVersionsRequest.getPrefix(), DEFAULT_ENCODING));
+            }
 
-        if (listVersionsRequest.getStartAfter() != null) {
-            params.put(KEY_MARKER, listVersionsRequest.getStartAfter());
+            if (listVersionsRequest.getStartAfter() != null) {
+                params.put(KEY_MARKER, URLEncoder.encode(listVersionsRequest.getStartAfter(), DEFAULT_ENCODING));
+            }
+        } catch (UnsupportedEncodingException exception) {
+            exception.printStackTrace();
         }
 
         if (listVersionsRequest.getMaxKeys() != null) {
@@ -614,8 +619,8 @@ public class HOSBucketOperation extends HOSOperation {
         Map<String, String> map = new HashMap<>();
         map.put(QUOTA, null);
 
-        Map<String,String> map1 =new HashMap<>();
-        map1.put(CONTENT_TYPE,APPLICATION_XML);
+        Map<String, String> map1 = new HashMap<>();
+        map1.put(CONTENT_TYPE, APPLICATION_XML);
 
         byte[] marshall = setBucketQuotaRequestMarshaller.marshall(quotaBucket);
         HOSRequestMessage request = new HOSRequestMessageBuilder(getInnerClient())

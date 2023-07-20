@@ -25,6 +25,7 @@ import java.net.URI;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * <p>Title: HOSClient</p>
@@ -322,7 +323,11 @@ public class HOSClient implements HOS {
 
     @Override
     public PutObjectResult putObject(PutObjectRequest putObjectRequest) throws ServiceException, ClientException {
-        return objectOperation.putObject(putObjectRequest);
+        PutObjectResult putObjectResult = objectOperation.putObject(putObjectRequest);
+        VersionListing versionListing = listVersions(putObjectRequest.getBucketName(), putObjectRequest.getKey());
+        List<HOSVersionSummary> collect = versionListing.getVersionSummaries().stream().filter(HOSVersionSummary::isLatest).collect(Collectors.toList());
+        putObjectResult.setVersionId(collect.isEmpty() ? null : collect.get(0).getVersionId());
+        return putObjectResult;
     }
 
     @Override
@@ -505,7 +510,11 @@ public class HOSClient implements HOS {
     @Override
     public CompleteMultipartUploadResult completeMultipartUpload(CompleteMultipartUploadRequest request)
             throws ServiceException, ClientException {
-        return multipartOperation.completeMultipartUpload(request);
+        CompleteMultipartUploadResult completeMultipartUploadResult = multipartOperation.completeMultipartUpload(request);
+        VersionListing versionListing = listVersions(request.getBucketName(), request.getKey());
+        List<HOSVersionSummary> collect = versionListing.getVersionSummaries().stream().filter(HOSVersionSummary::isLatest).collect(Collectors.toList());
+        completeMultipartUploadResult.setVersionId(collect.isEmpty() ? null : collect.get(0).getVersionId());
+        return completeMultipartUploadResult;
     }
 
     @Override
@@ -664,7 +673,7 @@ public class HOSClient implements HOS {
 
     @Override
     public InputStream getObjectInputstream(String bucket, String key) throws Throwable {
-        return  downloadOperation.getObjectInputstream(bucket,key);
+        return downloadOperation.getObjectInputstream(bucket, key);
     }
 
     @Override

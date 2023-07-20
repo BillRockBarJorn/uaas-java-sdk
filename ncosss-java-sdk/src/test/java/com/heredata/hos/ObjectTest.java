@@ -50,8 +50,8 @@ public class ObjectTest extends TestBase {
 
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(new byte[0]);
 
-        PutObjectRequest putObjectRequest = new PutObjectRequest("jssdk",
-                "2023/04/20/0"
+        PutObjectRequest putObjectRequest = new PutObjectRequest("versionbucket",
+                "/opdb/docfile/17853/6FA4982D58B14653B2B1370BB7D132BB/123321.docx"
                 , byteArrayInputStream, null);
 
 //        PutObjectRequest putObjectRequest = new PutObjectRequest("jssdk",
@@ -60,6 +60,7 @@ public class ObjectTest extends TestBase {
         try {
             PutObjectResult example = hos.putObject(putObjectRequest);
             if (example.getResponse().isSuccessful()) {
+                System.out.println(example);
                 System.out.println("上传成功");
             }
         } catch (ServiceException oe) {
@@ -89,9 +90,9 @@ public class ObjectTest extends TestBase {
 //            System.out.println("================================");
 
             // 查询前缀和大于"e"的对象
-            ListObjectsRequest prefixQuery = new ListObjectsRequest("jssdk");
+            ListObjectsRequest prefixQuery = new ListObjectsRequest("versionbucket");
 //            prefixQuery.setPrefix("prefix");
-            prefixQuery.setStartAfter("2023/04/26");
+//            prefixQuery.setStartAfter("2023/04/26");
             ObjectListing example1 = hos.listObjects(prefixQuery);
             example1.getObjectSummaries().stream().forEach(item -> System.out.println(item.getKey()));
             System.out.println("================================");
@@ -178,14 +179,14 @@ public class ObjectTest extends TestBase {
         HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
         try {
             // 创建请求对象
-//            VersionListing example = hos.listVersions(new ListVersionsRequest().withBucketName("jdsdk"));
-//            example.getVersionSummaries().stream().forEach(item -> System.out.println(item));
-//            System.out.println("================================");
+            VersionListing example = hos.listVersions(new ListVersionsRequest().withBucketName("versionbucket"));
+            example.getVersionSummaries().stream().forEach(item -> System.out.println(item));
+            System.out.println("================================");
 
 //            // 查询前缀和大于"e"的对象
-            VersionListing example1 = hos.listVersions("bucket", "2023", "a", null, 100);
-            example1.getVersionSummaries().stream().forEach(item -> System.out.println(item.getKey()));
-            System.out.println("================================");
+//            VersionListing example1 = hos.listVersions("jssdk", "2023", "a", null, 100);
+//            example1.getVersionSummaries().stream().forEach(item -> System.out.println(item.getKey()));
+//            System.out.println("================================");
 //
 //            // 设置查询数量
 //            ListVersionsRequest listVersionsRequest = new ListVersionsRequest("test_Hss2", null, null, null, 10);
@@ -401,19 +402,20 @@ public class ObjectTest extends TestBase {
     public void downLoadObject() throws Throwable {
         HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
         try {
-//            DownloadFileRequest downloadFileRequest = new DownloadFileRequest("bucket", "1677476459805");
+//            DownloadFileRequest downloadFileRequest = new DownloadFileRequest("versionbucket", "aa.avi");
+//            downloadFileRequest.setVersionId("4182cc941c7411eeac37c7c965b9af79");
 //            // 开启断点下载
 //            downloadFileRequest.setEnableCheckpoint(true);
 //            // 每片5M的进行下载
-//            downloadFileRequest.setPartSize(1024 * 1024 * 10);
+//            downloadFileRequest.setPartSize(1024 * 1024 * 5);
 //            // 下载本地的文件
-//            downloadFileRequest.setDownloadFile("E:\\比洛巴乔\\Desktop\\1677481919303.mp4");
+//            downloadFileRequest.setDownloadFile("E:\\比洛巴乔\\Desktop\\bb.avi");
 //            // 断点下载
 //            hos.downloadObject(downloadFileRequest);
             // 普通下载
-            DownloadFileRequest downloadFileRequest = new DownloadFileRequest("bucket", "2023/04/18/ccc.txt");
-//            downloadFileRequest = new DownloadFileRequest("example", "objectName2");
-            downloadFileRequest.setDownloadFile("E:\\比洛巴乔\\Desktop\\hahaha\\ccc.txt");
+            DownloadFileRequest downloadFileRequest = new DownloadFileRequest("versionbucket", "aa.avi");
+            downloadFileRequest.setVersionId("4182cc941c7411eeac37c7c965b9af79");
+            downloadFileRequest.setDownloadFile("E:\\比洛巴乔\\Desktop\\bb.avi");
             hos.downloadObject(downloadFileRequest);
         } catch (ServiceException oe) {
             System.out.println("Error Message:" + oe.getErrorMessage());
@@ -882,8 +884,8 @@ public class ObjectTest extends TestBase {
         HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
         try {
             // 分片上传、完成上传的基础信息
-            String bucketName = "bucket";
-            String key = System.currentTimeMillis() + ".xlsx";
+            String bucketName = "versionbucket";
+            String key = "aa.avi";
 
             // 构建初始化上传请求参数对象
             InitiateMultipartUploadRequest initiateMultipartUploadRequest =
@@ -895,7 +897,7 @@ public class ObjectTest extends TestBase {
             // 每个分片的大小，用于计算文件有多少个分片。单位为字节。
             final long partSize = 10 * 1024 * 1024L;   //5 MB。
             // 填写本地文件的完整路径。如果未指定本地路径，则默认从示例程序所属项目对应本地路径中上传文件。
-            final File sampleFile = new File("F:\\学习资料\\java相关\\javaweb第二阶段\\第8阶段：Spring框架(学习4天)\\Spring_day01_下载,概述.监听器\\aa.xlsx");
+            final File sampleFile = new File("F:\\学习资料\\java相关\\javaweb第二阶段\\第8阶段：Spring框架(学习4天)\\Spring_day01_下载,概述.监听器\\aa.avi");
             long fileLength = sampleFile.length();
             // 计算需要分多少片上传
             int partCount = (int) (fileLength / partSize);
@@ -932,7 +934,6 @@ public class ObjectTest extends TestBase {
                     new CompleteMultipartUploadRequest(bucketName, key, uploadId, partETags);
             // 完成上传
             CompleteMultipartUploadResult completeMultipartUploadResult = hos.completeMultipartUpload(completeMultipartUploadRequest);
-            System.out.println(completeMultipartUploadResult.getETag());
             System.out.println(System.currentTimeMillis() - start);
         } finally {
             if (hos != null) {
