@@ -30,6 +30,12 @@ public class HOSClientBuilder implements HOSBuilder {
                 clientConfiguration);
     }
 
+    @Override
+    public HOS build(String endpoint, String account, String accessKey, String secretKey, ClientConfiguration clientConfiguration, String bucket) {
+        return new HOSClient(endpoint, getDefaultCredentialProvider(accessKey, secretKey, account),
+                clientConfiguration,bucket);
+    }
+
     private static ClientBuilderConfiguration getClientConfiguration() {
         return new ClientBuilderConfiguration();
     }

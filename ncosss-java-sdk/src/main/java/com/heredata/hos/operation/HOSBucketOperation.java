@@ -34,6 +34,8 @@ import static com.heredata.hos.parser.ResponseParsers.*;
 import static com.heredata.hos.utils.HOSUtils.ensureBucketNameCreationValid;
 import static com.heredata.hos.utils.HOSUtils.ensureBucketNameValid;
 import static com.heredata.utils.CodingUtils.assertParameterNotNull;
+import static com.heredata.utils.ResourceUtils.urlEncode;
+import static com.heredata.utils.ResourceUtils.urlEncodeKey;
 import static com.heredata.utils.StringUtils.DEFAULT_ENCODING;
 import static com.heredata.utils.StringUtils.stringToByteArray;
 
@@ -197,9 +199,9 @@ public class HOSBucketOperation extends HOSOperation {
         ensureBucketNameValid(bucketName);
 
         try {
-            getBucketAcl(new GenericRequest(bucketName));
+            getBucketInfo(new GenericRequest(bucketName));
         } catch (ServiceException oe) {
-            if (oe.getErrorCode().equals(HOSErrorCode.NO_SUCH_BUCKET)) {
+            if (oe.getErrorMessage().contains(HOSErrorCode.NO_SUCH_BUCKET)) {
                 return false;
             }
         }
@@ -546,16 +548,13 @@ public class HOSBucketOperation extends HOSOperation {
 
     private static void populateListObjectsRequestParameters(ListObjectsRequest listObjectsRequest,
                                                              Map<String, String> params) {
-        try {
-            if (listObjectsRequest.getPrefix() != null) {
-                params.put(PREFIX, URLEncoder.encode(listObjectsRequest.getPrefix(), DEFAULT_ENCODING));
-            }
 
-            if (listObjectsRequest.getStartAfter() != null) {
-                params.put(START_AFTER, listObjectsRequest.getStartAfter());
-            }
-        } catch (UnsupportedEncodingException e) {
-            throw new ClientException(e);
+        if (listObjectsRequest.getPrefix() != null) {
+            params.put(PREFIX, urlEncodeKey(listObjectsRequest.getPrefix()));
+        }
+
+        if (listObjectsRequest.getStartAfter() != null) {
+            params.put(START_AFTER, listObjectsRequest.getStartAfter());
         }
         if (listObjectsRequest.getMaxKeys() != null) {
             params.put(MAX_KEYS, Integer.toString(listObjectsRequest.getMaxKeys()));

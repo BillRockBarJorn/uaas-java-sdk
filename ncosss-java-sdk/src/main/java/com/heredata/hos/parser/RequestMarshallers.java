@@ -223,7 +223,7 @@ public final class RequestMarshallers {
                 if (grant.getGrantee() instanceof GroupGrantee) {
                     xmlBody.append("<Grant>")
                             .append("<Grantee xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"CanonicalUser\">")
-                            .append("<URI>" + GroupGrantee.AllUsers.getGroupUri() + "</URI>")
+                            .append("<URI>" + ((GroupGrantee) grant.getGrantee()).getGroupUri() + "</URI>")
                             .append("</Grantee>")
                             .append("<Permission>" + grant.getPermission().getCannedAcl() + "</Permission>")
                             .append("</Grant>");

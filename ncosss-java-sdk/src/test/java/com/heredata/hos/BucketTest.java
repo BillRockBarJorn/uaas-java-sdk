@@ -30,7 +30,7 @@ public class BucketTest extends TestBase {
         HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
         try {
             // 创建请求对象，并且设置创建桶名为"example"的桶
-            CreateBucketRequest createBucketRequest = new CreateBucketRequest("versionbucket");
+            CreateBucketRequest createBucketRequest = new CreateBucketRequest("hadoop");
             VoidResult result = hos.createBucket(createBucketRequest);
             if (result.getResponse().isSuccessful()) {
                 System.out.println("创建成功");
@@ -57,9 +57,10 @@ public class BucketTest extends TestBase {
         HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
 
         try {
+            hos.doesBucketExist("date");
             // 查询桶名为"example"的详情
-            Bucket bucket = hos.getBucketInfo("bucket");
-            System.out.println(bucket);
+//            Bucket bucket = hos.getBucketInfo("date");
+//            System.out.println(bucket);
         } catch (ServiceException oe) {
             System.out.println("Error Message:" + oe.getErrorMessage());
             System.out.println("Error Code:" + oe.getErrorCode());

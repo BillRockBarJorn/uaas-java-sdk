@@ -12,6 +12,9 @@ import org.springframework.core.io.ClassPathResource;
 
 import javax.activation.MimetypesFileTypeMap;
 import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.channels.WritableByteChannel;
 import java.util.*;
 
 /**
@@ -22,10 +25,34 @@ import java.util.*;
 public class ObjectTest extends TestBase {
 
     @Test
-    public void test1() {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
-        ObjectListing hbase = hos.listObjects("bucket");
-        hbase.getObjectSummaries().forEach(item -> hos.deleteObject("bucket", item.getKey()));
+    public void test1() throws IOException {
+//        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+//        ObjectListing hbase = hos.listObjects("hadoop");
+//        hbase.getObjectSummaries().forEach(item -> hos.deleteObject("hadoop", item.getKey()));
+
+//        FileInputStream fis =new FileInputStream("E:\\比洛巴乔\\Desktop\\haha2.java");
+//        byte[] bys = new byte[64];
+//        int read = fis.read(bys, 4, 64);
+//        fis.close();
+
+        RandomAccessFile aFile = new
+                RandomAccessFile("E:\\比洛巴乔\\Desktop\\haha2.java", "rw");
+        FileChannel fromChannel = aFile.getChannel();
+        RandomAccessFile bFile = new
+                RandomAccessFile("E:\\比洛巴乔\\Desktop\\haha3.java", "rw");
+        FileChannel toChannel = bFile.getChannel();
+        long position = 0;
+        long count = fromChannel.size();
+        ByteBuffer allocate = ByteBuffer.allocate(16);
+        toChannel.read(allocate);
+        long l = fromChannel.transferTo(4, count, toChannel);
+        toChannel.write(allocate);
+        System.out.println(l);
+        aFile.close();
+        bFile.close();
+        System.out.println("over!");
+
+
     }
 
 
@@ -39,20 +66,20 @@ public class ObjectTest extends TestBase {
         HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
         // 设置对象的元数据
         ObjectMetadata objectMetadata = new ObjectMetadata();
-//        objectMetadata.setObjectStorageClass(StorageClass.ARCHIVE);
-////        objectMetadata.addUserMetadata("isdir", "false");
-////        objectMetadata.getUserMetadata().put("meta1", "I am meta1");
-////        objectMetadata.getUserMetadata().put("meta2", "I am meta2");
-////        objectMetadata.getUserMetadata().put("meta3", "I am meta3");
-//        objectMetadata.getUserMetadata().put("example", "txt1");
-//        objectMetadata.getUserMetadata().put("example2", "txt2");
+        objectMetadata.setObjectStorageClass(StorageClass.ARCHIVE);
+//        objectMetadata.addUserMetadata("isdir", "false");
+//        objectMetadata.getUserMetadata().put("meta1", "I am meta1");
+//        objectMetadata.getUserMetadata().put("meta2", "I am meta2");
+//        objectMetadata.getUserMetadata().put("meta3", "I am meta3");
+        objectMetadata.getUserMetadata().put("example", "txt1");
+        objectMetadata.getUserMetadata().put("example2", "txt2");
 
 
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(new byte[0]);
-
-        PutObjectRequest putObjectRequest = new PutObjectRequest("versionbucket",
-                "/opdb/docfile/17853/6FA4982D58B14653B2B1370BB7D132BB/123321.docx"
-                , byteArrayInputStream, null);
+//        /opdb/docfile/17853/6FA4982D58B14653B2B1370BB7D132BB/123321.docx
+        PutObjectRequest putObjectRequest = new PutObjectRequest("go-bucket",
+                "BP-1786105931-172.26.68.47-1692603292363/current/finalized/subdir0/subdir0/blk_1073741825_1001.meta"
+                , byteArrayInputStream, objectMetadata);
 
 //        PutObjectRequest putObjectRequest = new PutObjectRequest("jssdk",
 //                "2023/04/20/软负载安装.zip"
@@ -90,10 +117,10 @@ public class ObjectTest extends TestBase {
 //            System.out.println("================================");
 
             // 查询前缀和大于"e"的对象
-            ListObjectsRequest prefixQuery = new ListObjectsRequest("versionbucket");
+//            ListObjectsRequest prefixQuery = new ListObjectsRequest("hadoop","BP-1991540692-172.26.68.47-1692611683831/current/rbw",);
 //            prefixQuery.setPrefix("prefix");
 //            prefixQuery.setStartAfter("2023/04/26");
-            ObjectListing example1 = hos.listObjects(prefixQuery);
+            ObjectListing example1 = hos.listObjects("bucket");
             example1.getObjectSummaries().stream().forEach(item -> System.out.println(item.getKey()));
             System.out.println("================================");
 //
@@ -319,8 +346,10 @@ public class ObjectTest extends TestBase {
     public void getObject() {
         HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
         try {
-            GetObjectRequest getObjectRequest = new GetObjectRequest("bucket", "2023/04/23/a.avi");
-//            getObjectRequest.setIncludeInputStream(true);
+            GetObjectRequest getObjectRequest = new GetObjectRequest("hadoop", "BP-1991540692-172.26.68.47-1692611683831/current/finalized/subdir0/subdir0/blk_1073741833");
+            getObjectRequest.setIncludeInputStream(true);
+            long[] ranger = new long[]{0, 6};
+            getObjectRequest.setRange(ranger);
 //            http://172.18.232.37:8089/v1/HOS_7c9dfff2139b11edbc330391d2a979b2/hbase/hbase/MasterData/WALs/host-172-18-193-129%2C14001%2C1676295626289
             HOSObject example = hos.getObject(getObjectRequest);
             InputStream objectContent = example.getObjectContent();
@@ -431,6 +460,15 @@ public class ObjectTest extends TestBase {
         }
     }
 
+    @Test
+    public void test222() throws IOException {
+
+        try (RandomAccessFile file = new RandomAccessFile("E:\\devData\\temp\\hadoop\\dfs\\namenode\\data\\current\\a\\.a.txt", "rws");
+             FileOutputStream out = new FileOutputStream(file.getFD())) {
+
+        }
+    }
+
     /**
      * 删除对象
      */
@@ -439,9 +477,9 @@ public class ObjectTest extends TestBase {
         HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
         try {
 //            VoidResult example = hos.deleteObject("bucket4", "output/_temporary/1/_temporary/attempt_1673348273635_0005_r_000000_2/part-r-00000");
-            DeleteObjectsRequest deleteObjectsRequest = new DeleteObjectsRequest("jdsdk");
-            deleteObjectsRequest.setVersionId("95d91b50d5d811ed98cdcb0dd09ad600");
-            deleteObjectsRequest.setKey("2023/04/08/a.txt");
+            DeleteObjectsRequest deleteObjectsRequest = new DeleteObjectsRequest("go-bucket");
+//            deleteObjectsRequest.setVersionId("95d91b50d5d811ed98cdcb0dd09ad600");
+            deleteObjectsRequest.setKey("/opdb/docfile/17853/6FA4982D58B14653B2B1370BB7D132BB/123321.docx");
             hos.deleteObject(deleteObjectsRequest);
 //            hos.deleteObject("hive", "apps/hive/warehouse/students/student2.txt");
 //            hos.deleteObject("hive", "apps/hive/warehouse/students/student3.txt");
@@ -895,9 +933,9 @@ public class ObjectTest extends TestBase {
 
             String uploadId = initiateMultipartUploadResult.getUploadId();
             // 每个分片的大小，用于计算文件有多少个分片。单位为字节。
-            final long partSize = 10 * 1024 * 1024L;   //5 MB。
+            final long partSize = 1024 * 128;   //5 MB。
             // 填写本地文件的完整路径。如果未指定本地路径，则默认从示例程序所属项目对应本地路径中上传文件。
-            final File sampleFile = new File("F:\\学习资料\\java相关\\javaweb第二阶段\\第8阶段：Spring框架(学习4天)\\Spring_day01_下载,概述.监听器\\aa.avi");
+            final File sampleFile = new File("E:\\比洛巴乔\\Desktop\\狂神说JUC笔记.pdf");
             long fileLength = sampleFile.length();
             // 计算需要分多少片上传
             int partCount = (int) (fileLength / partSize);
@@ -1058,7 +1096,7 @@ public class ObjectTest extends TestBase {
         // 创建HOSClient实例。
         HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
 
-        File file = new File("F:\\学习资料\\java相关\\Java基础视屏-深入浅出\\day01\\avi\\01.01_计算机基础(计算机概述).avi");
+        File file = new File("E:\\devData\\home-space\\myStudy\\bigcomponent\\hadoop\\hadoop-branch-3.3.1\\BP-345915182-172.26.68.47-1692606038655\\current\\rbw\\blk_1073741825");
 
         try {
             ObjectMetadata meta = new ObjectMetadata();
@@ -1070,7 +1108,7 @@ public class ObjectTest extends TestBase {
 
             // 通过UploadFileRequest设置多个参数。
             // 依次填写Bucket名称（例如examplebucket）以及Object完整路径（例如exampledir/exampleobject.txt），Object完整路径中不能包含Bucket名称。
-            UploadObjectRequest uploadObjectRequest = new UploadObjectRequest("bucket", System.currentTimeMillis() + "");
+            UploadObjectRequest uploadObjectRequest = new UploadObjectRequest("bucket", "BP-1786105931-172.26.68.47-1692603292363/current/finalized/subdir0/subdir0/blk_1073741825");
 
             // 通过UploadFileRequest设置单个参数。
             // 填写本地文件的完整路径，例如D:\\localpath\\examplefile.txt。如果未指定本地路径，则默认从示例程序所属项目对应本地路径中上传文件。

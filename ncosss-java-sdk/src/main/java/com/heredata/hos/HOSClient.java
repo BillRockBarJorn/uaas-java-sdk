@@ -44,6 +44,11 @@ public class HOSClient implements HOS {
     /* The valid endpoint for accessing to HOS services */
     private URI endpoint;
 
+    /**
+     * 将bucket定位好
+     */
+    private String bucket;
+
     /* The default service client */
     private ServiceClient serviceClient;
 
@@ -96,6 +101,11 @@ public class HOSClient implements HOS {
         }
         initOperations();
         setEndpoint(endpoint);
+    }
+
+    public HOSClient(String endpoint, CredentialsProvider credsProvider, ClientConfiguration config, String bucket) {
+        this(endpoint, credsProvider, config);
+        this.bucket = bucket;
     }
 
     /**
@@ -217,6 +227,7 @@ public class HOSClient implements HOS {
 
     @Override
     public VoidResult setDefaultConfigBucketAcl(String bucketName) throws ServiceException, ClientException {
+        if (bucketName == null) bucketName = this.bucket;
         // ACL权限容器
         AccessControlList accessControlList = new AccessControlList();
         // 所有人包括匿名用户有可读权限
@@ -231,16 +242,19 @@ public class HOSClient implements HOS {
 
     @Override
     public VoidResult setBucketAcl(SetAclRequest setAclRequest) throws ServiceException, ClientException {
+        if (setAclRequest.getBucketName() == null) setAclRequest.setBucketName(this.bucket);
         return bucketOperation.setBucketAcl(setAclRequest);
     }
 
     @Override
     public AccessControlList getBucketAcl(String bucketName) throws ServiceException, ClientException {
+        if (bucketName == null) bucketName = this.bucket;
         return this.getBucketAcl(new GenericRequest(bucketName));
     }
 
     @Override
     public AccessControlList getBucketAcl(GenericRequest genericRequest) throws ServiceException, ClientException {
+        if (genericRequest.getBucketName() == null) genericRequest.setBucketName(this.bucket);
         return bucketOperation.getBucketAcl(genericRequest);
     }
 
@@ -251,6 +265,7 @@ public class HOSClient implements HOS {
 
     @Override
     public boolean doesBucketExist(GenericRequest genericRequest) throws ServiceException, ClientException {
+        if (genericRequest.getBucketName() == null) genericRequest.setBucketName(this.bucket);
         return bucketOperation.doesBucketExists(genericRequest);
     }
 
@@ -274,6 +289,7 @@ public class HOSClient implements HOS {
 
     @Override
     public ObjectListing listObjects(ListObjectsRequest listObjectsRequest) throws ServiceException, ClientException {
+        if (listObjectsRequest.getBucketName() == null) listObjectsRequest.setBucketName(this.bucket);
         return bucketOperation.listObjects(listObjectsRequest);
     }
 
@@ -295,6 +311,7 @@ public class HOSClient implements HOS {
 
     @Override
     public VersionListing listVersions(ListVersionsRequest listVersionsRequest) throws ServiceException, ClientException {
+        if (listVersionsRequest.getBucketName() == null) listVersionsRequest.setBucketName(this.bucket);
         return bucketOperation.listVersions(listVersionsRequest);
     }
 
@@ -323,6 +340,7 @@ public class HOSClient implements HOS {
 
     @Override
     public PutObjectResult putObject(PutObjectRequest putObjectRequest) throws ServiceException, ClientException {
+        if (putObjectRequest.getBucketName() == null) putObjectRequest.setBucketName(this.bucket);
         PutObjectResult putObjectResult = objectOperation.putObject(putObjectRequest);
         VersionListing versionListing = listVersions(putObjectRequest.getBucketName(), putObjectRequest.getKey());
         List<HOSVersionSummary> collect = versionListing.getVersionSummaries().stream().filter(HOSVersionSummary::isLatest).collect(Collectors.toList());
@@ -340,49 +358,56 @@ public class HOSClient implements HOS {
 
     @Override
     public CopyObjectResult copyObject(CopyObjectRequest copyObjectRequest) throws ServiceException, ClientException {
+        if (copyObjectRequest.getSourceBucketName() == null) copyObjectRequest.setSourceBucketName(this.bucket);
+        if (copyObjectRequest.getDestinationBucketName() == null)
+            copyObjectRequest.setDestinationBucketName(this.bucket);
         return objectOperation.copyObject(copyObjectRequest);
     }
 
     @Override
     public HOSObject getObject(String bucketName, String key) throws ServiceException, ClientException {
-        return this.getObject(new GetObjectRequest(bucketName, key));
+        return getObject(new GetObjectRequest(bucketName, key));
     }
 
 
     @Override
     public HOSObject getObject(GetObjectRequest getObjectRequest) throws ServiceException, ClientException {
+        if (getObjectRequest.getBucketName() == null) getObjectRequest.setBucketName(this.bucket);
         return objectOperation.getObject(getObjectRequest);
     }
 
     @Override
     public SimplifiedObjectMeta getSimplifiedObjectMeta(String bucketName, String key)
             throws ServiceException, ClientException {
-        return this.getSimplifiedObjectMeta(new GenericRequest(bucketName, key));
+        return getSimplifiedObjectMeta(new GenericRequest(bucketName, key));
     }
 
     @Override
     public SimplifiedObjectMeta getSimplifiedObjectMeta(GenericRequest genericRequest)
             throws ServiceException, ClientException {
-        return this.objectOperation.getSimplifiedObjectMeta(genericRequest);
+        if (genericRequest.getBucketName() == null) genericRequest.setBucketName(this.bucket);
+        return objectOperation.getSimplifiedObjectMeta(genericRequest);
     }
 
     @Override
     public ObjectMetadata getObjectMetadata(String bucketName, String key) throws ServiceException, ClientException {
-        return this.getObjectMetadata(new GenericRequest(bucketName, key));
+        return getObjectMetadata(new GenericRequest(bucketName, key));
     }
 
     @Override
     public ObjectMetadata getObjectMetadata(GenericRequest genericRequest) throws ServiceException, ClientException {
+        if (genericRequest.getBucketName() == null) genericRequest.setBucketName(this.bucket);
         return objectOperation.getMetadata(genericRequest);
     }
 
     @Override
     public VoidResult deleteObject(String bucketName, String key) throws ServiceException, ClientException {
-        return this.deleteObject(new GenericRequest(bucketName, key));
+        return deleteObject(new GenericRequest(bucketName, key));
     }
 
     @Override
     public VoidResult deleteObject(GenericRequest genericRequest) throws ServiceException, ClientException {
+        if (genericRequest.getBucketName() == null) genericRequest.setBucketName(this.bucket);
         return objectOperation.deleteObject(genericRequest);
     }
 
@@ -393,18 +418,21 @@ public class HOSClient implements HOS {
 
     @Override
     public VoidResult deleteVersion(DeleteVersionRequest deleteVersionRequest) throws ServiceException, ClientException {
+        if (deleteVersionRequest.getBucketName() == null) deleteVersionRequest.setBucketName(this.bucket);
         return objectOperation.deleteVersion(deleteVersionRequest);
     }
 
     @Override
     public DeleteObjectsResult deleteObjects(DeleteObjectsRequest deleteObjectsRequest)
             throws ServiceException, ClientException {
+        if (deleteObjectsRequest.getBucketName() == null) deleteObjectsRequest.setBucketName(this.bucket);
         return objectOperation.deleteObjects(deleteObjectsRequest);
     }
 
     @Override
     public DeleteVersionsResult deleteVersions(DeleteVersionsRequest deleteVersionsRequest)
             throws ServiceException, ClientException {
+        if (deleteVersionsRequest.getBucketName() == null) deleteVersionsRequest.setBucketName(this.bucket);
         return objectOperation.deleteVersions(deleteVersionsRequest);
     }
 
@@ -416,6 +444,7 @@ public class HOSClient implements HOS {
 
     @Override
     public boolean doesObjectExist(GenericRequest genericRequest) throws ServiceException, ClientException {
+        if (genericRequest.getBucketName() == null) genericRequest.setBucketName(this.bucket);
         return objectOperation.doesObjectExist(genericRequest);
     }
 
@@ -424,92 +453,101 @@ public class HOSClient implements HOS {
             throws ServiceException, ClientException {
         setAclRequest.setBucketName(bucketName);
         setAclRequest.setKey(key);
-        return this.setObjectAcl(setAclRequest);
+        return setObjectAcl(setAclRequest);
     }
 
     @Override
     public VoidResult setObjectAcl(SetAclRequest setAclRequest) throws ServiceException, ClientException {
         setAclRequest.setOwner(new Owner(this.credsProvider.getCredentials().getAccountId()));
+        if (setAclRequest.getBucketName() == null) setAclRequest.setBucketName(this.bucket);
         return objectOperation.setObjectAcl(setAclRequest);
     }
 
     @Override
     public AccessControlList getObjectAcl(String bucketName, String key) throws ServiceException, ClientException {
-        return this.getObjectAcl(new GenericRequest(bucketName, key));
+        return getObjectAcl(new GenericRequest(bucketName, key));
     }
 
     @Override
     public AccessControlList getObjectAcl(GenericRequest genericRequest) throws ServiceException, ClientException {
+        if (genericRequest.getBucketName() == null) genericRequest.setBucketName(this.bucket);
         return objectOperation.getObjectAcl(genericRequest);
     }
 
     @Override
     public RestoreObjectResult restoreObject(String bucketName, String key) throws ServiceException, ClientException {
-        return this.restoreObject(new GenericRequest(bucketName, key));
+        return restoreObject(new GenericRequest(bucketName, key));
     }
 
     @Override
     public RestoreObjectResult restoreObject(GenericRequest genericRequest) throws ServiceException, ClientException {
+        if (genericRequest.getBucketName() == null) genericRequest.setBucketName(this.bucket);
         return objectOperation.restoreObject(genericRequest);
     }
 
     @Override
     public RestoreObjectResult restoreObject(String bucketName, String key, RestoreConfiguration restoreConfiguration)
             throws ServiceException, ClientException {
-        return this.restoreObject(new RestoreObjectRequest(bucketName, key, restoreConfiguration));
+        return restoreObject(new RestoreObjectRequest(bucketName, key, restoreConfiguration));
     }
 
     @Override
     public RestoreObjectResult restoreObject(RestoreObjectRequest restoreObjectRequest)
             throws ServiceException, ClientException {
+        if (restoreObjectRequest.getBucketName() == null) restoreObjectRequest.setBucketName(this.bucket);
         return objectOperation.restoreObject(restoreObjectRequest);
     }
 
     @Override
     public VoidResult setObjectTagging(String bucketName, String key, Map<String, String> tags)
             throws ServiceException, ClientException {
-        return this.setObjectTagging(new SetObjectTaggingRequest(bucketName, key, tags));
+        return setObjectTagging(new SetObjectTaggingRequest(bucketName, key, tags));
     }
 
     @Override
     public VoidResult setObjectTagging(String bucketName, String key, TagSet tagSet) throws ServiceException, ClientException {
-        return this.setObjectTagging(new SetObjectTaggingRequest(bucketName, key, tagSet));
+        return setObjectTagging(new SetObjectTaggingRequest(bucketName, key, tagSet));
     }
 
     @Override
     public VoidResult setObjectTagging(SetObjectTaggingRequest setObjectTaggingRequest) throws ServiceException, ClientException {
+        if (setObjectTaggingRequest.getBucketName() == null) setObjectTaggingRequest.setBucketName(this.bucket);
         return objectOperation.setObjectTagging(setObjectTaggingRequest);
     }
 
     @Override
     public TagSet getObjectTagging(String bucketName, String key) throws ServiceException, ClientException {
-        return this.getObjectTagging(new GenericRequest(bucketName, key));
+        return getObjectTagging(new GenericRequest(bucketName, key));
     }
 
     @Override
     public TagSet getObjectTagging(GenericRequest genericRequest) throws ServiceException, ClientException {
+        if (genericRequest.getBucketName() == null) genericRequest.setBucketName(this.bucket);
         return objectOperation.getObjectTagging(genericRequest);
     }
 
     @Override
     public VoidResult deleteObjectTagging(String bucketName, String key) throws ServiceException, ClientException {
-        return this.deleteObjectTagging(new GenericRequest(bucketName, key));
+        return deleteObjectTagging(new GenericRequest(bucketName, key));
     }
 
     @Override
     public VoidResult deleteObjectTagging(GenericRequest genericRequest) throws ServiceException, ClientException {
+        if (genericRequest.getBucketName() == null) genericRequest.setBucketName(this.bucket);
         return objectOperation.deleteObjectTagging(genericRequest);
     }
 
 
     @Override
     public VoidResult abortMultipartUpload(AbortMultipartUploadRequest request) throws ServiceException, ClientException {
+        if (request.getBucketName() == null) request.setBucketName(this.bucket);
         return multipartOperation.abortMultipartUpload(request);
     }
 
     @Override
     public CompleteMultipartUploadResult completeMultipartUpload(CompleteMultipartUploadRequest request)
             throws ServiceException, ClientException {
+        if (request.getBucketName() == null) request.setBucketName(this.bucket);
         CompleteMultipartUploadResult completeMultipartUploadResult = multipartOperation.completeMultipartUpload(request);
         VersionListing versionListing = listVersions(request.getBucketName(), request.getKey());
         List<HOSVersionSummary> collect = versionListing.getVersionSummaries().stream().filter(HOSVersionSummary::isLatest).collect(Collectors.toList());
@@ -520,22 +558,26 @@ public class HOSClient implements HOS {
     @Override
     public InitiateMultipartUploadResult initiateMultipartUpload(InitiateMultipartUploadRequest request)
             throws ServiceException, ClientException {
+        if (request.getBucketName() == null) request.setBucketName(this.bucket);
         return multipartOperation.initiateMultipartUpload(request);
     }
 
     @Override
     public MultipartUploadListing listMultipartUploads(ListMultipartUploadsRequest request)
             throws ServiceException, ClientException {
+        if (request.getBucketName() == null) request.setBucketName(this.bucket);
         return multipartOperation.listMultipartUploads(request);
     }
 
     @Override
     public PartListing listParts(ListPartsRequest request) throws ServiceException, ClientException {
+        if (request.getBucketName() == null) request.setBucketName(this.bucket);
         return multipartOperation.listParts(request);
     }
 
     @Override
     public UploadPartResult uploadPart(UploadPartRequest request) throws ServiceException, ClientException {
+        if (request.getBucketName() == null) request.setBucketName(this.bucket);
         if (request.getPartSize() < 1024 * 100) {
             request.setPartSize(1024 * 1024 * 4);
         }
@@ -550,12 +592,14 @@ public class HOSClient implements HOS {
     @Override
     public BucketVersioningConfiguration getBucketVersioning(GenericRequest genericRequest)
             throws ServiceException, ClientException {
+        if (genericRequest.getBucketName() == null) genericRequest.setBucketName(this.bucket);
         return bucketOperation.getBucketVersioning(genericRequest);
     }
 
     @Override
     public VoidResult setBucketVersioning(SetBucketVersioningRequest setBucketVersioningRequest)
             throws ServiceException, ClientException {
+        if (setBucketVersioningRequest.getBucketName() == null) setBucketVersioningRequest.setBucketName(this.bucket);
         return bucketOperation.setBucketVersioning(setBucketVersioningRequest);
     }
 
@@ -563,116 +607,129 @@ public class HOSClient implements HOS {
     @Override
     public VoidResult setBucketLifecycle(SetBucketLifecycleRequest setBucketLifecycleRequest)
             throws ServiceException, ClientException {
+        if (setBucketLifecycleRequest.getBucketName() == null) setBucketLifecycleRequest.setBucketName(this.bucket);
         return bucketOperation.setBucketLifecycle(setBucketLifecycleRequest);
     }
 
     @Override
     public List<LifecycleRule> getBucketLifecycle(String bucketName) throws ServiceException, ClientException {
-        return this.getBucketLifecycle(new GenericRequest(bucketName));
+        return getBucketLifecycle(new GenericRequest(bucketName));
     }
 
     @Override
     public List<LifecycleRule> getBucketLifecycle(GenericRequest genericRequest) throws ServiceException, ClientException {
+        if (genericRequest.getBucketName() == null) genericRequest.setBucketName(this.bucket);
         return bucketOperation.getBucketLifecycle(genericRequest);
     }
 
     @Override
     public VoidResult deleteBucketLifecycle(String bucketName) throws ServiceException, ClientException {
-        return this.deleteBucketLifecycle(new GenericRequest(bucketName));
+        return deleteBucketLifecycle(new GenericRequest(bucketName));
     }
 
     @Override
     public VoidResult deleteBucketLifecycle(GenericRequest genericRequest) throws ServiceException, ClientException {
+        if (genericRequest.getBucketName() == null) genericRequest.setBucketName(this.bucket);
         return bucketOperation.deleteBucketLifecycle(genericRequest);
     }
 
     @Override
     public VoidResult setBucketTagging(String bucketName, Map<String, String> tags) throws ServiceException, ClientException {
-        return this.setBucketTagging(new SetBucketTaggingRequest(bucketName, tags));
+        return setBucketTagging(new SetBucketTaggingRequest(bucketName, tags));
     }
 
     @Override
     public VoidResult setBucketTagging(String bucketName, TagSet tagSet) throws ServiceException, ClientException {
-        return this.setBucketTagging(new SetBucketTaggingRequest(bucketName, tagSet));
+        return setBucketTagging(new SetBucketTaggingRequest(bucketName, tagSet));
     }
 
     @Override
     public VoidResult setBucketTagging(SetBucketTaggingRequest setBucketTaggingRequest) throws ServiceException, ClientException {
-        return this.bucketOperation.setBucketTagging(setBucketTaggingRequest);
+        if (setBucketTaggingRequest.getBucketName() == null) setBucketTaggingRequest.setBucketName(this.bucket);
+        return bucketOperation.setBucketTagging(setBucketTaggingRequest);
     }
 
     @Override
     public TagSet getBucketTagging(String bucketName) throws ServiceException, ClientException {
-        return this.getBucketTagging(new GenericRequest(bucketName));
+        return getBucketTagging(new GenericRequest(bucketName));
     }
 
     @Override
     public TagSet getBucketTagging(GenericRequest genericRequest) throws ServiceException, ClientException {
-        return this.bucketOperation.getBucketTagging(genericRequest);
+        if (genericRequest.getBucketName() == null) genericRequest.setBucketName(this.bucket);
+        return bucketOperation.getBucketTagging(genericRequest);
     }
 
     @Override
     public VoidResult deleteBucketTagging(String bucketName) throws ServiceException, ClientException {
-        return this.deleteBucketTagging(new GenericRequest(bucketName));
+        return deleteBucketTagging(new GenericRequest(bucketName));
     }
 
     @Override
     public VoidResult deleteBucketTagging(GenericRequest genericRequest) throws ServiceException, ClientException {
-        return this.bucketOperation.deleteBucketTagging(genericRequest);
+        if (genericRequest.getBucketName() == null) genericRequest.setBucketName(this.bucket);
+        return bucketOperation.deleteBucketTagging(genericRequest);
     }
 
     @Override
     public Bucket getBucketInfo(String bucketName) throws ServiceException, ClientException {
-        return this.getBucketInfo(new GenericRequest(bucketName));
+        return getBucketInfo(new GenericRequest(bucketName));
     }
 
     @Override
     public Bucket getBucketInfo(GenericRequest genericRequest) throws ServiceException, ClientException {
-        return this.bucketOperation.getBucketInfo(genericRequest);
+        if (genericRequest.getBucketName() == null) genericRequest.setBucketName(this.bucket);
+        return bucketOperation.getBucketInfo(genericRequest);
     }
 
     @Override
     public VoidResult setBucketPolicy(String bucketName, String policyText) throws ServiceException, ClientException {
-        return this.setBucketPolicy(new SetBucketPolicyRequest(bucketName, policyText));
+        return setBucketPolicy(new SetBucketPolicyRequest(bucketName, policyText));
     }
 
     @Override
     public VoidResult setBucketPolicy(SetBucketPolicyRequest setBucketPolicyRequest) throws ServiceException, ClientException {
-        return this.bucketOperation.setBucketPolicy(setBucketPolicyRequest);
+        if (setBucketPolicyRequest.getBucketName() == null) setBucketPolicyRequest.setBucketName(this.bucket);
+        return bucketOperation.setBucketPolicy(setBucketPolicyRequest);
     }
 
     @Override
     public GetBucketPolicyResult getBucketPolicy(GenericRequest genericRequest) throws ServiceException, ClientException {
-        return this.bucketOperation.getBucketPolicy(genericRequest);
+        if (genericRequest.getBucketName() == null) genericRequest.setBucketName(this.bucket);
+        return bucketOperation.getBucketPolicy(genericRequest);
     }
 
     @Override
     public GetBucketPolicyResult getBucketPolicy(String bucketName) throws ServiceException, ClientException {
-        return this.getBucketPolicy(new GenericRequest(bucketName));
+        return getBucketPolicy(new GenericRequest(bucketName));
     }
 
     @Override
     public VoidResult deleteBucketPolicy(GenericRequest genericRequest) throws ServiceException, ClientException {
-        return this.bucketOperation.deleteBucketPolicy(genericRequest);
+        if (genericRequest.getBucketName() == null) genericRequest.setBucketName(this.bucket);
+        return bucketOperation.deleteBucketPolicy(genericRequest);
     }
 
     @Override
     public VoidResult deleteBucketPolicy(String bucketName) throws ServiceException, ClientException {
-        return this.deleteBucketPolicy(new GenericRequest(bucketName));
+        return deleteBucketPolicy(new GenericRequest(bucketName));
     }
 
     @Override
     public CompleteMultipartUploadResult uploadFile(UploadObjectRequest uploadObjectRequest) throws Throwable {
-        return this.uploadOperation.uploadFile(uploadObjectRequest);
+        if (uploadObjectRequest.getBucketName() == null) uploadObjectRequest.setBucketName(this.bucket);
+        return uploadOperation.uploadFile(uploadObjectRequest);
     }
 
     @Override
     public DownloadFileResult downloadObject(DownloadFileRequest downloadFileRequest) throws Throwable {
+        if (downloadFileRequest.getBucketName() == null) downloadFileRequest.setBucketName(this.bucket);
         return downloadOperation.downloadFile(downloadFileRequest);
     }
 
     @Override
     public InputStream getObjectInputstream(String bucket, String key) throws Throwable {
+        if (bucket == null) bucket = this.bucket;
         return downloadOperation.getObjectInputstream(bucket, key);
     }
 
@@ -683,17 +740,19 @@ public class HOSClient implements HOS {
 
     @Override
     public VoidResult setAccountQuota(SetAccountQuotaRequest setAccountQuotaRequest) throws ServiceException, ClientException {
-        return this.accountOperation.setAccountQuota(setAccountQuotaRequest);
+        return accountOperation.setAccountQuota(setAccountQuotaRequest);
     }
 
     @Override
     public BucketQuotaResult getBucketQuota(String bucket) throws ServiceException, ClientException {
-        return this.bucketOperation.getBucketQuota(bucket);
+        if (bucket == null) bucket = this.bucket;
+        return bucketOperation.getBucketQuota(bucket);
     }
 
     @Override
     public VoidResult setBucketQuota(SetBucketQuotaRequest setBucketQuotaRequest) throws ServiceException, ClientException {
-        return this.bucketOperation.setBucketQuota(setBucketQuotaRequest);
+        if (setBucketQuotaRequest.getBucketName() == null) setBucketQuotaRequest.setBucketName(this.bucket);
+        return bucketOperation.setBucketQuota(setBucketQuotaRequest);
     }
 
     @Override
@@ -708,6 +767,10 @@ public class HOSClient implements HOS {
         } catch (Exception e) {
             LogUtils.logException("shutdown throw exception: ", e);
         }
+    }
+
+    public String getBucket() {
+        return bucket;
     }
 }
 

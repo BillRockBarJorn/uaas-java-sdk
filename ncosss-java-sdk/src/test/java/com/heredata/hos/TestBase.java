@@ -47,14 +47,14 @@ public class TestBase {
 
         KeyInformation keyInformation = new KeyInformation();
 //        keyInformation.setEndPoint("http://172.18.232.37:8089/v1/");
-        keyInformation.setEndPoint("http://172.18.232.192:8089/v1/");
+        keyInformation.setEndPoint("http://172.18.232.37:6055/HOSv1/");
         try {
             keyInformation.setKeyInformation("test_user1", "TEST#ps@857"
                     , "test_pro1"
                     , "http://172.18.232.192:6020/v3/auth/tokens");
-            System.out.println("AccessKey="+keyInformation.getAccessKey());
-            System.out.println("SecretKey="+keyInformation.getSecretKey());
-            System.out.println("Token="+keyInformation.getXSubjectToken());
+            System.out.println("AccessKey=" + keyInformation.getAccessKey());
+            System.out.println("SecretKey=" + keyInformation.getSecretKey());
+            System.out.println("Token=" + keyInformation.getXSubjectToken());
 //            keyInformation.setSecretId(StringUtils.getPointLengthUUID(32), new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24), "http://172.18.232.37:6069/v1/secrets");
         } catch (URISyntaxException e) {
             e.printStackTrace();
