@@ -1201,21 +1201,24 @@ public final class ResponseParsers {
         try {
             Element root = getXmlRootElement(responseBody);
             TagSet tagSet = new TagSet();
+            if(root.getChild("TagSet")!=null && root.getChild("TagSet").getChildren("Tag")!=null){
+
             List<Element> tagElems = root.getChild("TagSet").getChildren("Tag");
 
-            for (Element tagElem : tagElems) {
-                String key = null;
-                String value = null;
+                for (Element tagElem : tagElems) {
+                    String key = null;
+                    String value = null;
 
-                if (tagElem.getChild("Key") != null) {
-                    key = tagElem.getChildText("Key");
+                    if (tagElem.getChild("Key") != null) {
+                        key = tagElem.getChildText("Key");
+                    }
+
+                    if (tagElem.getChild("Value") != null) {
+                        value = tagElem.getChildText("Value");
+                    }
+
+                    tagSet.setTag(key, value);
                 }
-
-                if (tagElem.getChild("Value") != null) {
-                    value = tagElem.getChildText("Value");
-                }
-
-                tagSet.setTag(key, value);
             }
 
             return tagSet;

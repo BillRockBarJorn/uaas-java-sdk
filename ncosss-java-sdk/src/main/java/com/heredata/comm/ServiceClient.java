@@ -109,10 +109,7 @@ public abstract class ServiceClient {
                 // Step 2. 构建http请求参数实体   并且将context添加到request中
                 Request httpRequest = buildRequest(request, context);
 
-                LogUtils.getLog().info("sdk version is" + "1.0.0-RELEASE");
-                LogUtils.getLog().info("requestURL：：" + httpRequest.uri);
-                LogUtils.getLog().info(httpRequest.method);
-                LogUtils.getLog().info(httpRequest.getHeaders());
+                LogUtils.getLog().info("requestURL：：" + httpRequest.uri+"  method:"+httpRequest.method+"  headers:"+httpRequest.getHeaders());
 
                 // Step 3. Send HTTP request to HOS.
                 String poolStatsInfo = config.isLogConnectionPoolStatsEnable() ? "Connection pool stats " + getConnectionPoolStats() : "";
@@ -183,6 +180,7 @@ public abstract class ServiceClient {
 
             return request;
         }
+
 
         request.setHeaders(requestMessage.getHeaders());
         // The header must be converted after the request is signed,

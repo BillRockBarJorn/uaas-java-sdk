@@ -167,7 +167,7 @@ public class HOSUtils {
 //        if (bucket != null && !isCname && !clientConfig.isSLDEnabled()) {
 //            cannonicalHost.append(bucket).append(".").append(host);
 //        } else {
-            cannonicalHost.append(host);
+        cannonicalHost.append(host);
 //        }
 
         return cannonicalHost.toString();
@@ -187,7 +187,7 @@ public class HOSUtils {
     }
 
     public static String determineResourcePath(String bucket, String key, boolean sldEnabled) {
-        return sldEnabled ? makeResourcePath(bucket, key) : makeResourcePath(key);
+        return sldEnabled ? makeResourcePath(bucket, key) : makeResourcePath(bucket, key);
     }
 
     public static String determineResourcePath(String account, String bucket, String key, boolean sldEnabled) {
@@ -218,7 +218,7 @@ public class HOSUtils {
      */
     public static String makeResourcePath(String bucket, String key) {
         if (bucket != null) {
-            return bucket + "/" + (key != null ? urlEncodeKey(key) : "");
+            return bucket + (key != null ? "/" + urlEncodeKey(key) : "");
         } else {
             return null;
         }

@@ -181,7 +181,11 @@ public class HOSRequestMessageBuilder {
         request.setBucket(bucket);
         request.setKey(key);
         request.setEndpoint(determineFinalEndpoint(this.endpoint, this.bucket, clientCofig));
-        request.setResourcePath(determineResourcePath(this.account, this.bucket, this.key, clientCofig.isSLDEnabled()));
+        String resourcePath = null;
+        if ("HOS_null".equals(this.account))
+            resourcePath = determineResourcePath(this.bucket, this.key, clientCofig.isSLDEnabled());
+        else resourcePath = determineResourcePath(this.account, this.bucket, this.key, clientCofig.isSLDEnabled());
+        request.setResourcePath(resourcePath);
         request.setHeaders(sentHeaders);
         request.setParameters(sentParameters);
         request.setMethod(this.method);

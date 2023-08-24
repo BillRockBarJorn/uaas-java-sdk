@@ -42,17 +42,12 @@ public class DefaultCredentialProvider implements CredentialsProvider {
     }
 
     private static void checkCredentials(String accessKey, String secretKey, String account) {
-        if (accessKey == null || accessKey.equals("")) {
+        if (accessKey == null || "".equals(accessKey.trim())) {
             throw new InvalidCredentialsException("Access key should not be null or empty.");
         }
 
-        if (secretKey == null || secretKey.equals("")) {
+        if (secretKey == null || "".equals(secretKey.trim())) {
             throw new InvalidCredentialsException("Secret key should not be null or empty.");
         }
-
-        if (account == null || account.equals("")) {
-            throw new InvalidCredentialsException("account should not be null or empty.");
-        }
     }
-
 }

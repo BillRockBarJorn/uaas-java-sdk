@@ -30,7 +30,7 @@ public class AccountTest extends TestBase {
          * accessKey：向UAAS服务请求到的access_key
          * secretKey：向UAAS服务请求到的secret_key
          */
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
         try {
             // 查询账户详情
             AccountInfo accountInfo = hos.getAccountInfo();
@@ -54,7 +54,7 @@ public class AccountTest extends TestBase {
      */
     @Test
     public void queryBuckets() {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
         /**
          * 查询出所有的桶
          */
@@ -119,8 +119,7 @@ public class AccountTest extends TestBase {
      */
     @Test
     public void listBuckets() {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
-
+        HOS hos = getHOSClient();
         try {
             List<Bucket> buckets = hos.listBuckets();
             buckets.forEach(System.out::println);
@@ -140,7 +139,7 @@ public class AccountTest extends TestBase {
 
     @Test
     public void queryBucketsByPage() {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
         // 创建通查询请求对象，并且设置每次查询最多2个元素
         ListBucketsRequest listBucketsRequest = new ListBucketsRequest().withMaxKeys(1);
         // 分页页数
@@ -187,7 +186,7 @@ public class AccountTest extends TestBase {
     @Test
     public void setQuota() {
 
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
         // 创建账户配额请求对象并设置配额数量
         SetAccountQuotaRequest setAccountQuotaRequest = new SetAccountQuotaRequest(0L);
         try {
@@ -221,7 +220,8 @@ public class AccountTest extends TestBase {
          * accessKey：向UAAS服务请求到的access_key
          * secretKey：向UAAS服务请求到的secret_key
          */
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
+
         try {
             AccountInfo accountInfo1 = hos.getAccountQuota();
             System.out.println(accountInfo1);

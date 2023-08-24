@@ -24,10 +24,6 @@ public class DefaultCredentials implements Credentials {
             throw new InvalidCredentialsException("Secret key should not be null or empty.");
         }
 
-        if (accountId == null || accountId.equals("")) {
-            throw new InvalidCredentialsException("accountId should not be null or empty.");
-        }
-
         this.accessKey = accessKey;
         this.secretKey = secretKey;
         this.accountId = accountId;

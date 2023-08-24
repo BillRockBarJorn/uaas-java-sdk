@@ -48,6 +48,7 @@ public class TestBase {
         KeyInformation keyInformation = new KeyInformation();
 //        keyInformation.setEndPoint("http://172.18.232.37:8089/v1/");
         keyInformation.setEndPoint("http://172.18.232.37:6055/HOSv1/");
+//        keyInformation.setEndPoint("http://172.18.232.192:8089/v1/");
         try {
             keyInformation.setKeyInformation("test_user1", "TEST#ps@857"
                     , "test_pro1"
@@ -109,6 +110,11 @@ public class TestBase {
             }
         }
 
+    }
+
+    public static HOS getHOSClient() {
+//        return new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        return new HOSClientBuilder().build(endPoint, accessKey, secretKey);
     }
 
 }

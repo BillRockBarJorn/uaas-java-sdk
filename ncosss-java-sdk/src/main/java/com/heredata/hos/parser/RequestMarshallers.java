@@ -220,18 +220,17 @@ public final class RequestMarshallers {
                     .append("<AccessControlList>");
             Set<Grant> grants = setBucketAclRequest.getAccessControlList().getGrants();
             for (Grant grant : grants) {
-                if (grant.getGrantee() instanceof GroupGrantee) {
+                if (grant.getGrantee() instanceof CanonicalUserGrantee) {
                     xmlBody.append("<Grant>")
                             .append("<Grantee xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"CanonicalUser\">")
-                            .append("<URI>" + ((GroupGrantee) grant.getGrantee()).getGroupUri() + "</URI>")
+                            .append("<ID>" + ((CanonicalUserGrantee) grant.getGrantee()).getUserId() + "</ID>")
                             .append("</Grantee>")
                             .append("<Permission>" + grant.getPermission().getCannedAcl() + "</Permission>")
                             .append("</Grant>");
-                } else if (grant.getGrantee() instanceof CanonicalUserGrantee) {
-                    CanonicalUserGrantee canonicalUserGrantee = (CanonicalUserGrantee) grant.getGrantee();
+                } else if (grant.getGrantee() instanceof GroupGrantee) {
                     xmlBody.append("<Grant>")
                             .append("<Grantee xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"Group\">")
-                            .append("<ID>" + canonicalUserGrantee.getUserId() + "</ID>")
+                            .append("<URI>" + ((GroupGrantee) grant.getGrantee()).getGroupUri() + "</URI>")
                             .append("</Grantee>")
                             .append("<Permission>" + grant.getPermission().getCannedAcl() + "</Permission>")
                             .append("</Grant>");

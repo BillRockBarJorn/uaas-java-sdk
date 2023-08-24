@@ -20,20 +20,28 @@ public class HOSClientBuilder implements HOSBuilder {
 
     @Override
     public HOS build(String endpoint, String account, String accessKey, String secretKey) {
-        return new HOSClient(endpoint, getDefaultCredentialProvider(accessKey, secretKey, account),
-                getClientConfiguration());
+        return build(endpoint, account, accessKey, secretKey, getClientConfiguration());
     }
 
     @Override
     public HOS build(String endpoint, String account, String accessKey, String secretKey, ClientConfiguration clientConfiguration) {
-        return new HOSClient(endpoint, getDefaultCredentialProvider(accessKey, secretKey, account),
-                clientConfiguration);
+        return build(endpoint, account,accessKey, secretKey, clientConfiguration, null);
     }
 
+    /**
+     * 该接口适用对象存储NCOSS-3.*版本，4.*版本请使用
+     * @param endpoint 对象存储的endpoint
+     * @param account 账户（租户）id
+     * @param accessKey
+     * @param secretKey
+     * @param clientConfiguration 客户端配置类
+     * @param bucket 桶名，如果不想传桶名，而且用的到的桶是固定，可以采取该方式
+     * @return
+     */
     @Override
     public HOS build(String endpoint, String account, String accessKey, String secretKey, ClientConfiguration clientConfiguration, String bucket) {
         return new HOSClient(endpoint, getDefaultCredentialProvider(accessKey, secretKey, account),
-                clientConfiguration,bucket);
+                clientConfiguration, bucket);
     }
 
     private static ClientBuilderConfiguration getClientConfiguration() {
@@ -52,5 +60,24 @@ public class HOSClientBuilder implements HOSBuilder {
     private static DefaultCredentialProvider getDefaultCredentialProvider(String accessKey, String secretKey,
                                                                           String account) {
         return new DefaultCredentialProvider(accessKey, secretKey, account);
+    }
+
+    private static DefaultCredentialProvider getDefaultCredentialProvider(String accessKey, String secretKey) {
+        return new DefaultCredentialProvider(accessKey, secretKey);
+    }
+
+    @Override
+    public HOS build(String endpoint, String accessKey, String secretKey) {
+        return build(endpoint, accessKey, secretKey, getClientConfiguration(), null);
+    }
+
+    @Override
+    public HOS build(String endpoint, String accessKey, String secretKey, ClientConfiguration clientConfiguration) {
+        return build(endpoint, accessKey, secretKey, clientConfiguration, null);
+    }
+
+    @Override
+    public HOS build(String endpoint, String accessKey, String secretKey, ClientConfiguration clientConfiguration, String bucket) {
+        return new HOSClient(endpoint, getDefaultCredentialProvider(accessKey, secretKey), clientConfiguration, bucket);
     }
 }

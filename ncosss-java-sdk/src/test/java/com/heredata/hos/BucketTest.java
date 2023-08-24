@@ -27,10 +27,10 @@ public class BucketTest extends TestBase {
      */
     @Test
     public void createBucket() {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
         try {
             // 创建请求对象，并且设置创建桶名为"example"的桶
-            CreateBucketRequest createBucketRequest = new CreateBucketRequest("hadoop");
+            CreateBucketRequest createBucketRequest = new CreateBucketRequest("ncoss-3");
             VoidResult result = hos.createBucket(createBucketRequest);
             if (result.getResponse().isSuccessful()) {
                 System.out.println("创建成功");
@@ -54,13 +54,16 @@ public class BucketTest extends TestBase {
      */
     @Test
     public void getBucketDetail() {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
-
+        HOS hos = getHOSClient();
         try {
-            hos.doesBucketExist("date");
-            // 查询桶名为"example"的详情
-//            Bucket bucket = hos.getBucketInfo("date");
-//            System.out.println(bucket);
+            if (hos.doesBucketExist("ncoss-4")) {
+
+                //查询桶名为"example"的详情
+                Bucket bucket = hos.getBucketInfo("ncoss-4");
+                System.out.println(bucket);
+            }else{
+                System.out.println("桶不存在");
+            }
         } catch (ServiceException oe) {
             System.out.println("Error Message:" + oe.getErrorMessage());
             System.out.println("Error Code:" + oe.getErrorCode());
@@ -82,7 +85,7 @@ public class BucketTest extends TestBase {
      */
     @Test
     public void deleteBucket() {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
         try {
             VoidResult result = hos.deleteBucket("my-bucketname");
             if (result.getResponse().isSuccessful()) {
@@ -110,10 +113,10 @@ public class BucketTest extends TestBase {
      */
     @Test
     public void setBucketQuota() {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
         // 配置设置配额请求参数对象
         SetBucketQuotaRequest setBucketQuota = new SetBucketQuotaRequest(0L, 0);
-        setBucketQuota.setBucketName("bucket");
+        setBucketQuota.setBucketName("ncoss-4");
         try {
             VoidResult result = hos.setBucketQuota(setBucketQuota);
             if (result.getResponse().isSuccessful()) {
@@ -138,9 +141,9 @@ public class BucketTest extends TestBase {
      */
     @Test
     public void getBucketQuota() {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
         try {
-            BucketQuotaResult result = hos.getBucketQuota("bucket");
+            BucketQuotaResult result = hos.getBucketQuota("ncoss-4");
             System.out.println(result);
         } catch (ServiceException oe) {
             System.out.println("Error Message:" + oe.getErrorMessage());
@@ -165,13 +168,13 @@ public class BucketTest extends TestBase {
      */
     @Test
     public void setBucketPolicy() {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
         // 桶策略字符串
         String policyText = "{\"Version\":\"2023-04-04\",\"Statement\":[{\"Sid\":\"Stmt1375240018061\",\"Action\":[\"PutBucketAcl\"]" +
                 ",\"Effect\":\"Allow\",\"Resource\":[\"example\"],\"Principal\":{\"HWS\":[\"test_pro1:root\"]}}]}";
 //        String policyText = "{\"Version\": \"2023-04-25\",\"Statement\": [{\"Action\": [\"ListBucket\",\"HeadBucket\"],\"Effect\": \"Allow\",\"Principal\": {\"HWS\": [\"*\"]},\"Resource\": [\"jdsdk\"],\"Sid\": \"\"},{\"Action\": [\"GetObject\"],\"Effect\": \"Allow\",\"Principal\": {\"HWS\": [\"*\"]},\"Resource\": [\"jdsdk\"],\"Sid\": \"\"}]}";
         try {
-            VoidResult result = hos.setBucketPolicy("bucket", policyText);
+            VoidResult result = hos.setBucketPolicy("ncoss-4", policyText);
             if (result.getResponse().isSuccessful()) {
                 System.out.println("设置桶策略成功");
             }
@@ -194,9 +197,9 @@ public class BucketTest extends TestBase {
      */
     @Test
     public void getBucketPolicy() {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
         try {
-            GetBucketPolicyResult bucket1 = hos.getBucketPolicy("jdsdk");
+            GetBucketPolicyResult bucket1 = hos.getBucketPolicy("ncoss-4");
             System.out.println(bucket1);
         } catch (ServiceException oe) {
             System.out.println("Error Message:" + oe.getErrorMessage());
@@ -217,9 +220,9 @@ public class BucketTest extends TestBase {
      */
     @Test
     public void deleteBucketPolicy() {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
         try {
-            VoidResult bucket1 = hos.deleteBucketPolicy("rocke");
+            VoidResult bucket1 = hos.deleteBucketPolicy("ncoss-4");
             System.out.println(bucket1);
         } catch (ServiceException oe) {
             System.out.println("Error Message:" + oe.getErrorMessage());
@@ -243,7 +246,7 @@ public class BucketTest extends TestBase {
      */
     @Test
     public void setBucketACL() {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
         // ACL权限容器
         AccessControlList accessControlList = new AccessControlList();
 
@@ -264,7 +267,7 @@ public class BucketTest extends TestBase {
         setBucketAclRequest.setOwner(owner);
         try {
             // 设置
-            VoidResult result = hos.setBucketAcl("rocke", setBucketAclRequest);
+            VoidResult result = hos.setBucketAcl("ncoss-4", setBucketAclRequest);
             if (result.getResponse().isSuccessful()) {
                 System.out.println("设置成功");
             }
@@ -287,10 +290,10 @@ public class BucketTest extends TestBase {
      */
     @Test
     public void setBucketDefaultACL() {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
         try {
             // 设置
-            VoidResult result = hos.setDefaultConfigBucketAcl("rocke");
+            VoidResult result = hos.setDefaultConfigBucketAcl("ncoss-4");
             if (result.getResponse().isSuccessful()) {
                 System.out.println("设置成功");
             }
@@ -313,9 +316,9 @@ public class BucketTest extends TestBase {
      */
     @Test
     public void getBucketACL() {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
         try {
-            AccessControlList result = hos.getBucketAcl("rocke");
+            AccessControlList result = hos.getBucketAcl("ncoss-4");
             System.out.println(result);
         } catch (ServiceException oe) {
             System.out.println("Error Message:" + oe.getErrorMessage());
@@ -341,13 +344,13 @@ public class BucketTest extends TestBase {
      */
     @Test
     public void setBucketVersioning() {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
 
         // 创建桶生命周期配置类
         BucketVersioningConfiguration bucketVersioningConfiguration = new BucketVersioningConfiguration();
         bucketVersioningConfiguration.setStatus(ENABLED);
         // 创建请求对象
-        SetBucketVersioningRequest setBucketVersioningRequest = new SetBucketVersioningRequest("versionbucket", bucketVersioningConfiguration);
+        SetBucketVersioningRequest setBucketVersioningRequest = new SetBucketVersioningRequest("ncoss-4", bucketVersioningConfiguration);
         try {
             // 设置桶生命周期
             VoidResult result = hos.setBucketVersioning(setBucketVersioningRequest);
@@ -373,9 +376,9 @@ public class BucketTest extends TestBase {
      */
     @Test
     public void getBucketVersioning() {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
         try {
-            BucketVersioningConfiguration result = hos.getBucketVersioning("rocke");
+            BucketVersioningConfiguration result = hos.getBucketVersioning("ncoss-4");
             System.out.println(result);
         } catch (ServiceException oe) {
             System.out.println("Error Message:" + oe.getErrorMessage());
@@ -398,9 +401,9 @@ public class BucketTest extends TestBase {
      */
     @Test
     public void setBucketLifecycle() {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
 
-        SetBucketLifecycleRequest setBucketLifecycleRequest = new SetBucketLifecycleRequest("rocke");
+        SetBucketLifecycleRequest setBucketLifecycleRequest = new SetBucketLifecycleRequest("ncoss-4");
         LifecycleRule lifecycleRule = new LifecycleRule();
         // 设置过滤器，对哪些对象进行生命周期设置
         LifecycleRule.Filter filter = new LifecycleRule.Filter();
@@ -442,9 +445,9 @@ public class BucketTest extends TestBase {
      */
     @Test
     public void getBucketLifecycle() {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
         try {
-            List<LifecycleRule> result = hos.getBucketLifecycle("rocke");
+            List<LifecycleRule> result = hos.getBucketLifecycle("ncoss-4");
             System.out.println(result);
         } catch (ServiceException oe) {
             System.out.println("Error Message:" + oe.getErrorMessage());
@@ -465,7 +468,7 @@ public class BucketTest extends TestBase {
      */
     @Test
     public void deleteBucketLifecycle() {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
         try {
             VoidResult result = hos.deleteBucketLifecycle("rocke");
             if (result.getResponse().isSuccessful()) {
@@ -491,12 +494,12 @@ public class BucketTest extends TestBase {
      */
     @Test
     public void bucketTagging() {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
 
         Map<String, String> map = new HashMap<>();
         map.put("key1", "value1");
         map.put("key2", "value2");
-        SetBucketTaggingRequest setBucketTaggingRequest = new SetBucketTaggingRequest("rocke", map);
+        SetBucketTaggingRequest setBucketTaggingRequest = new SetBucketTaggingRequest("ncoss-4", map);
         try {
             // 设置标签
             VoidResult result = hos.setBucketTagging(setBucketTaggingRequest);
@@ -522,9 +525,9 @@ public class BucketTest extends TestBase {
      */
     @Test
     public void getBucketTagging() {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
         try {
-            TagSet result = hos.getBucketTagging("rocke");
+            TagSet result = hos.getBucketTagging("ncoss-4");
             System.out.println(result);
         } catch (ServiceException oe) {
             System.out.println("Error Message:" + oe.getErrorMessage());
@@ -545,9 +548,9 @@ public class BucketTest extends TestBase {
      */
     @Test
     public void deleteBucketTagging() {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
         try {
-            VoidResult result = hos.deleteBucketTagging("rocke");
+            VoidResult result = hos.deleteBucketTagging("ncoss-4");
             if (result.getResponse().isSuccessful()) {
                 System.out.println("删除成功");
             }

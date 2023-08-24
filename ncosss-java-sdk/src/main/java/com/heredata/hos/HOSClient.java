@@ -342,9 +342,9 @@ public class HOSClient implements HOS {
     public PutObjectResult putObject(PutObjectRequest putObjectRequest) throws ServiceException, ClientException {
         if (putObjectRequest.getBucketName() == null) putObjectRequest.setBucketName(this.bucket);
         PutObjectResult putObjectResult = objectOperation.putObject(putObjectRequest);
-        VersionListing versionListing = listVersions(putObjectRequest.getBucketName(), putObjectRequest.getKey());
-        List<HOSVersionSummary> collect = versionListing.getVersionSummaries().stream().filter(HOSVersionSummary::isLatest).collect(Collectors.toList());
-        putObjectResult.setVersionId(collect.isEmpty() ? null : collect.get(0).getVersionId());
+//        VersionListing versionListing = listVersions(putObjectRequest.getBucketName(), putObjectRequest.getKey());
+//        List<HOSVersionSummary> collect = versionListing.getVersionSummaries().stream().filter(HOSVersionSummary::isLatest).collect(Collectors.toList());
+//        putObjectResult.setVersionId(collect.isEmpty() ? null : collect.get(0).getVersionId());
         return putObjectResult;
     }
 

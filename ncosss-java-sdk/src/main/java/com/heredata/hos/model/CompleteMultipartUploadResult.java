@@ -4,6 +4,7 @@ import com.heredata.model.GenericResult;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 /**
  * <p>Title: 完成分片上传结果</p>
@@ -17,6 +18,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class CompleteMultipartUploadResult extends GenericResult {
 
     /**

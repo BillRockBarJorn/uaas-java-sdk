@@ -12,9 +12,6 @@ import org.springframework.core.io.ClassPathResource;
 
 import javax.activation.MimetypesFileTypeMap;
 import java.io.*;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import java.nio.channels.WritableByteChannel;
 import java.util.*;
 
 /**
@@ -26,31 +23,31 @@ public class ObjectTest extends TestBase {
 
     @Test
     public void test1() throws IOException {
-//        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
-//        ObjectListing hbase = hos.listObjects("hadoop");
-//        hbase.getObjectSummaries().forEach(item -> hos.deleteObject("hadoop", item.getKey()));
+        HOS hos = getHOSClient();
+        ObjectListing hbase = hos.listObjects("hadoop");
+        hbase.getObjectSummaries().forEach(item -> hos.deleteObject("hadoop", item.getKey()));
 
 //        FileInputStream fis =new FileInputStream("E:\\比洛巴乔\\Desktop\\haha2.java");
 //        byte[] bys = new byte[64];
 //        int read = fis.read(bys, 4, 64);
 //        fis.close();
 
-        RandomAccessFile aFile = new
-                RandomAccessFile("E:\\比洛巴乔\\Desktop\\haha2.java", "rw");
-        FileChannel fromChannel = aFile.getChannel();
-        RandomAccessFile bFile = new
-                RandomAccessFile("E:\\比洛巴乔\\Desktop\\haha3.java", "rw");
-        FileChannel toChannel = bFile.getChannel();
-        long position = 0;
-        long count = fromChannel.size();
-        ByteBuffer allocate = ByteBuffer.allocate(16);
-        toChannel.read(allocate);
-        long l = fromChannel.transferTo(4, count, toChannel);
-        toChannel.write(allocate);
-        System.out.println(l);
-        aFile.close();
-        bFile.close();
-        System.out.println("over!");
+//        RandomAccessFile aFile = new
+//                RandomAccessFile("E:\\比洛巴乔\\Desktop\\haha2.java", "rw");
+//        FileChannel fromChannel = aFile.getChannel();
+//        RandomAccessFile bFile = new
+//                RandomAccessFile("E:\\比洛巴乔\\Desktop\\haha3.java", "rw");
+//        FileChannel toChannel = bFile.getChannel();
+//        long position = 0;
+//        long count = fromChannel.size();
+//        ByteBuffer allocate = ByteBuffer.allocate(16);
+//        toChannel.read(allocate);
+//        long l = fromChannel.transferTo(4, count, toChannel);
+//        toChannel.write(allocate);
+//        System.out.println(l);
+//        aFile.close();
+//        bFile.close();
+//        System.out.println("over!");
 
 
     }
@@ -63,10 +60,10 @@ public class ObjectTest extends TestBase {
     @Test
     public void createObject() throws FileNotFoundException {
 
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
         // 设置对象的元数据
         ObjectMetadata objectMetadata = new ObjectMetadata();
-        objectMetadata.setObjectStorageClass(StorageClass.ARCHIVE);
+//        objectMetadata.setObjectStorageClass(StorageClass.ARCHIVE);
 //        objectMetadata.addUserMetadata("isdir", "false");
 //        objectMetadata.getUserMetadata().put("meta1", "I am meta1");
 //        objectMetadata.getUserMetadata().put("meta2", "I am meta2");
@@ -75,10 +72,10 @@ public class ObjectTest extends TestBase {
         objectMetadata.getUserMetadata().put("example2", "txt2");
 
 
-        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(new byte[0]);
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(new byte[]{97, 98, 99, 100});
 //        /opdb/docfile/17853/6FA4982D58B14653B2B1370BB7D132BB/123321.docx
-        PutObjectRequest putObjectRequest = new PutObjectRequest("go-bucket",
-                "BP-1786105931-172.26.68.47-1692603292363/current/finalized/subdir0/subdir0/blk_1073741825_1001.meta"
+        PutObjectRequest putObjectRequest = new PutObjectRequest("ncoss-4",
+                "a/b/c/d"
                 , byteArrayInputStream, objectMetadata);
 
 //        PutObjectRequest putObjectRequest = new PutObjectRequest("jssdk",
@@ -109,7 +106,7 @@ public class ObjectTest extends TestBase {
      */
     @Test
     public void listObjects() {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
         try {
             // 创建请求对象
 //            ObjectListing example = hos.listObjects("jssdk", "");
@@ -120,7 +117,7 @@ public class ObjectTest extends TestBase {
 //            ListObjectsRequest prefixQuery = new ListObjectsRequest("hadoop","BP-1991540692-172.26.68.47-1692611683831/current/rbw",);
 //            prefixQuery.setPrefix("prefix");
 //            prefixQuery.setStartAfter("2023/04/26");
-            ObjectListing example1 = hos.listObjects("bucket");
+            ObjectListing example1 = hos.listObjects("ncoss-3", "a");
             example1.getObjectSummaries().stream().forEach(item -> System.out.println(item.getKey()));
             System.out.println("================================");
 //
@@ -147,7 +144,7 @@ public class ObjectTest extends TestBase {
 
     @Test
     public void demo3() {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
         String prefix = "";
         ListObjectsRequest listRequest = new ListObjectsRequest("example");
         listRequest.setPrefix(prefix.trim().length() > 0 ? prefix : null);
@@ -160,7 +157,7 @@ public class ObjectTest extends TestBase {
 
     @Test
     public void listVersionsObjectsByPage() {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
 
         // 页码
         int index = 1;
@@ -172,13 +169,13 @@ public class ObjectTest extends TestBase {
             do {
                 System.out.println("====================第 " + index + " 页======================");
                 // 构建请求参数并查询
-                versionListing = hos.listVersions(new ListVersionsRequest().withBucketName("test_Hss2")
+                versionListing = hos.listVersions(new ListVersionsRequest().withBucketName("ncoss-4")
                         .withStartAfter(nextStartAfter).withMaxKeys(2));
 
                 // 打印结果
                 List<HOSVersionSummary> sums = versionListing.getVersionSummaries();
                 for (HOSVersionSummary s : sums) {
-                    System.out.println(s.getKey());
+                    System.out.println(s);
                 }
                 // 获取nextStartAfter
                 nextStartAfter = versionListing.getNextStartAfter();
@@ -203,10 +200,10 @@ public class ObjectTest extends TestBase {
      */
     @Test
     public void listVersions() {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
         try {
             // 创建请求对象
-            VersionListing example = hos.listVersions(new ListVersionsRequest().withBucketName("versionbucket"));
+            VersionListing example = hos.listVersions(new ListVersionsRequest().withBucketName("ncoss-4"));
             example.getVersionSummaries().stream().forEach(item -> System.out.println(item));
             System.out.println("================================");
 
@@ -236,7 +233,7 @@ public class ObjectTest extends TestBase {
 
     @Test
     public void listObjectsByPage() {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
 
         // 页码
         int index = 1;
@@ -280,7 +277,7 @@ public class ObjectTest extends TestBase {
      */
     @Test
     public void createObject_SSE_KMS() throws FileNotFoundException {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
         // 设置加密id
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setServerSideEncryption("here:kms");
@@ -312,7 +309,7 @@ public class ObjectTest extends TestBase {
      */
     @Test
     public void createObject_SSE_C() throws FileNotFoundException {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
         // 构建请求头元数据
         ObjectMetadata objectMetadata = new ObjectMetadata();
         // 设置加密方法
@@ -343,39 +340,19 @@ public class ObjectTest extends TestBase {
      * 查询对象详情:对象最后更新时间,标签、对象大小、对象mime类型
      */
     @Test
-    public void getObject() {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+    public void getObject() throws IOException {
+        HOS hos = getHOSClient();
         try {
-            GetObjectRequest getObjectRequest = new GetObjectRequest("hadoop", "BP-1991540692-172.26.68.47-1692611683831/current/finalized/subdir0/subdir0/blk_1073741833");
+            GetObjectRequest getObjectRequest = new GetObjectRequest("ncoss-4", "a/b/c/d");
+            getObjectRequest.setVersionId("3e34fac4425a11eeb3a4fa163e2fcf06");
             getObjectRequest.setIncludeInputStream(true);
-            long[] ranger = new long[]{0, 6};
-            getObjectRequest.setRange(ranger);
 //            http://172.18.232.37:8089/v1/HOS_7c9dfff2139b11edbc330391d2a979b2/hbase/hbase/MasterData/WALs/host-172-18-193-129%2C14001%2C1676295626289
             HOSObject example = hos.getObject(getObjectRequest);
             InputStream objectContent = example.getObjectContent();
-//            InputStreamReader isr = new InputStreamReader(objectContent, "UTF-8");
-//            //将字符流以缓存的形式一行一行输出
-//            BufferedReader bf = new BufferedReader(isr);
-//            String results = "";
-//            String newLine = "";
-//            while ((newLine = bf.readLine()) != null) {
-//                results += newLine;
-//            }
 
-            OutputStream os = null;
-            try {
-//                is = new FileInputStream(objectContent);
-                os = new FileOutputStream("E:\\比洛巴乔\\Desktop\\NCOSSFileSystemStore2.java");
-                byte[] buffer = new byte[1024];
-                int length;
-                while ((length = objectContent.read(buffer)) > 0) {
-                    os.write(buffer, 0, length);
-                }
-            } finally {
-                objectContent.close();
-                os.close();
-            }
-//            System.out.println(results);
+            byte bys[] = new byte[128];
+            int read = objectContent.read(bys);
+            System.out.println("内容为：" + new String(bys, 0, read));
             System.out.println(example);
         } catch (ServiceException oe) {
             System.out.println("Error Message:" + oe.getErrorMessage());
@@ -384,8 +361,6 @@ public class ObjectTest extends TestBase {
             System.out.println("Host ID:" + oe.getHostId());
         } catch (ClientException ce) {
             System.out.println("Error Message:" + ce.getMessage());
-        } catch (IOException ioException) {
-            ioException.printStackTrace();
         } finally {
             if (hos != null) {
                 hos.shutdown();
@@ -398,7 +373,7 @@ public class ObjectTest extends TestBase {
      */
     @Test
     public void getObjectInfo_SSE_C() {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
         // 构建获取对象请求参数
         GetObjectRequest getObjectRequest = new GetObjectRequest("example", "2022/08/15/c.txt");
         getObjectRequest.setIncludeInputStream(true);
@@ -429,23 +404,24 @@ public class ObjectTest extends TestBase {
      */
     @Test
     public void downLoadObject() throws Throwable {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
         try {
-//            DownloadFileRequest downloadFileRequest = new DownloadFileRequest("versionbucket", "aa.avi");
+            DownloadFileRequest downloadFileRequest = new DownloadFileRequest("ncoss-4", "aa.avi");
 //            downloadFileRequest.setVersionId("4182cc941c7411eeac37c7c965b9af79");
-//            // 开启断点下载
-//            downloadFileRequest.setEnableCheckpoint(true);
-//            // 每片5M的进行下载
-//            downloadFileRequest.setPartSize(1024 * 1024 * 5);
-//            // 下载本地的文件
-//            downloadFileRequest.setDownloadFile("E:\\比洛巴乔\\Desktop\\bb.avi");
-//            // 断点下载
-//            hos.downloadObject(downloadFileRequest);
-            // 普通下载
-            DownloadFileRequest downloadFileRequest = new DownloadFileRequest("versionbucket", "aa.avi");
-            downloadFileRequest.setVersionId("4182cc941c7411eeac37c7c965b9af79");
+            // 开启断点下载
+            downloadFileRequest.setEnableCheckpoint(true);
+            // 每片5M的进行下载
+            downloadFileRequest.setPartSize(1024 * 128);
+            // 下载本地的文件
             downloadFileRequest.setDownloadFile("E:\\比洛巴乔\\Desktop\\bb.avi");
+            // 断点下载
             hos.downloadObject(downloadFileRequest);
+//            // 普通下载
+//            DownloadFileRequest downloadFileRequest = new DownloadFileRequest("ncoss-4", "a/b/c/d");
+//            downloadFileRequest.setVersionId("3e34fac4425a11eeb3a4fa163e2fcf06");
+////            downloadFileRequest.setVersionId("4182cc941c7411eeac37c7c965b9af79");
+//            downloadFileRequest.setDownloadFile("E:\\比洛巴乔\\Desktop\\blk_1073741825_1001.meta");
+//            hos.downloadObject(downloadFileRequest);
         } catch (ServiceException oe) {
             System.out.println("Error Message:" + oe.getErrorMessage());
             System.out.println("Error Code:" + oe.getErrorCode());
@@ -457,15 +433,6 @@ public class ObjectTest extends TestBase {
             if (hos != null) {
                 hos.shutdown();
             }
-        }
-    }
-
-    @Test
-    public void test222() throws IOException {
-
-        try (RandomAccessFile file = new RandomAccessFile("E:\\devData\\temp\\hadoop\\dfs\\namenode\\data\\current\\a\\.a.txt", "rws");
-             FileOutputStream out = new FileOutputStream(file.getFD())) {
-
         }
     }
 
@@ -474,16 +441,12 @@ public class ObjectTest extends TestBase {
      */
     @Test
     public void deleteObject() {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
         try {
-//            VoidResult example = hos.deleteObject("bucket4", "output/_temporary/1/_temporary/attempt_1673348273635_0005_r_000000_2/part-r-00000");
-            DeleteObjectsRequest deleteObjectsRequest = new DeleteObjectsRequest("go-bucket");
-//            deleteObjectsRequest.setVersionId("95d91b50d5d811ed98cdcb0dd09ad600");
-            deleteObjectsRequest.setKey("/opdb/docfile/17853/6FA4982D58B14653B2B1370BB7D132BB/123321.docx");
+            DeleteObjectsRequest deleteObjectsRequest = new DeleteObjectsRequest("ncoss-4");
+            deleteObjectsRequest.setVersionId("3e34fac4425a11eeb3a4fa163e2fcf06");
+            deleteObjectsRequest.setKey("a/b/c/d");
             hos.deleteObject(deleteObjectsRequest);
-//            hos.deleteObject("hive", "apps/hive/warehouse/students/student2.txt");
-//            hos.deleteObject("hive", "apps/hive/warehouse/students/student3.txt");
-//            hos.deleteObject("hive", "apps/hive/warehouse/students/students.txt");
         } catch (ServiceException oe) {
             System.out.println("Error Message:" + oe.getErrorMessage());
             System.out.println("Error Code:" + oe.getErrorCode());
@@ -501,30 +464,20 @@ public class ObjectTest extends TestBase {
 
 
     /**
-     * 删除对象
-     */
-    @Test
-    public void test() {
-
-        String aaa = "";
-        System.out.println(aaa.split("/").length);
-
-    }
-
-    /**
      * 对象标签管理
      */
     @Test
     public void objectTagging() {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
-
+        HOS hos = getHOSClient();
         Map<String, String> map = new HashMap<>();
         map.put("key1", "value1");
         map.put("key2", "value2");
         map.put("key3", "value3");
         try {
+            SetObjectTaggingRequest request = new SetObjectTaggingRequest("ncoss-4", "a/b/c/d", map);
+            request.setVersionId("4b574ab8425a11eeb3a4fa163e2fcf06");
             // 设置标签
-            VoidResult example = hos.setObjectTagging("bucket1", "2023/01/08/qwert.txt", map);
+            VoidResult example = hos.setObjectTagging(request);
             if (example.getResponse().isSuccessful()) {
                 System.out.println("设置成功");
             }
@@ -547,9 +500,9 @@ public class ObjectTest extends TestBase {
      */
     @Test
     public void getObjectTagging() {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
         try {
-            TagSet example = hos.getObjectTagging("bucket1", "2023/01/08/qwert.txt");
+            TagSet example = hos.getObjectTagging("ncoss-4", "a/b/c/d");
             System.out.println(example);
         } catch (ServiceException oe) {
             System.out.println("Error Message:" + oe.getErrorMessage());
@@ -570,9 +523,9 @@ public class ObjectTest extends TestBase {
      */
     @Test
     public void deleteObjectTagging() {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
         try {
-            VoidResult example = hos.deleteObjectTagging("bucket1", "2023/01/08/qwert.txt");
+            VoidResult example = hos.deleteObjectTagging("ncoss-4", "a/b/c/d");
             if (example.getResponse().isSuccessful()) {
                 System.out.println("删除成功");
             }
@@ -596,7 +549,7 @@ public class ObjectTest extends TestBase {
      */
     @Test
     public void setObjectAcl() {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
         // 设置权限控制信息，所有用户可匿名访问
         Grantee grantee = GroupGrantee.AllUsers;
         // 设置权限
@@ -611,7 +564,9 @@ public class ObjectTest extends TestBase {
         accessControlList.grantPermission(grantee, write);
 
         // 构建请求参数对象
-        SetAclRequest setAclRequest = new SetAclRequest("bucket", "2023/04/18/ccc.txt", accessControlList);
+        SetAclRequest setAclRequest = new SetAclRequest("ncoss-4", "a/b/c/d", accessControlList);
+        // 如果对象有版本号，必须要填写版本号
+        //setAclRequest.setVersionId("4b574ab8425a11eeb3a4fa163e2fcf06");
         try {
             // 设置
             VoidResult result = hos.setObjectAcl(setAclRequest);
@@ -635,9 +590,10 @@ public class ObjectTest extends TestBase {
      */
     @Test
     public void getObjectAcl() {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
         try {
-            AccessControlList example = hos.getObjectAcl("bucket1", "2023/01/08/qwert.txt");
+            GenericRequest genericRequest = new GenericRequest("ncoss-4", "a/b/c/d", "4b574ab8425a11eeb3a4fa163e2fcf06");
+            AccessControlList example = hos.getObjectAcl(genericRequest);
             System.out.println(example);
         } catch (ServiceException oe) {
             System.out.println("Error Message:" + oe.getErrorMessage());
@@ -658,10 +614,10 @@ public class ObjectTest extends TestBase {
      */
     @Test
     public void copyObject() {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
         // 构建复制对象请求参数
-        CopyObjectRequest copyObjectRequest = new CopyObjectRequest("bucket", "2023/04/18/aaa.txt",
-                "bucket", "2023/04/18/dest.txt");
+        CopyObjectRequest copyObjectRequest = new CopyObjectRequest("ncoss-4", "a/b/c/d",
+                "ncoss-3", "a/b/c/d");
 
 
         // 设置对象的元数据
@@ -696,7 +652,7 @@ public class ObjectTest extends TestBase {
      */
     @Test
     public void copyObject_SSE_KMS() {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
         // 构建复制对象的请求参数
         CopyObjectRequest copyObjectRequest = new CopyObjectRequest("example", "2022/08/15/b.txt"
                 , "example", "2022/08/15/c.txt");
@@ -728,7 +684,7 @@ public class ObjectTest extends TestBase {
      */
     @Test
     public void copyObject_SSE_C() {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
         // 构建复制对象请求参数
         CopyObjectRequest copyObjectRequest = new CopyObjectRequest("example", "2022/08/15/b.txt"
                 , "example", "2022/08/15/c.txt");
@@ -762,7 +718,7 @@ public class ObjectTest extends TestBase {
      */
     @Test
     public void restoreObject2() throws IOException {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
         RestoreConfiguration restoreConfiguration = new RestoreConfiguration(1);
         RestoreObjectResult example = hos.restoreObject("bucket", "2023/04/20/aaa.txt", restoreConfiguration);
 
@@ -777,7 +733,7 @@ public class ObjectTest extends TestBase {
      */
     @Test
     public void restoreObject() throws IOException {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
 
         /**
          * 上传一个ARCHIVE对象
@@ -817,11 +773,11 @@ public class ObjectTest extends TestBase {
      */
     @Test
     public void downRestoreObject() throws IOException {
+        HOS hos = getHOSClient();
         ClassPathResource classPathResource = new ClassPathResource("testFile/test1.txt");
         File file = classPathResource.getFile();
         GetObjectRequest getObjectRequest = new GetObjectRequest("bucket1", "2022/08/24/a.txt");
         getObjectRequest.setIncludeInputStream(true);
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
         HOSObject example = hos.getObject(getObjectRequest);
         InputStream objectContent = example.getObjectContent();
         IOUtils.writeOutFile(objectContent, new File(file.getParent(), UUID.randomUUID() + ".txt").getAbsolutePath());
@@ -832,7 +788,7 @@ public class ObjectTest extends TestBase {
      */
     @Test
     public void initiateMultipartUpload() {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
         // 构建初始化上传请求参数对象
         InitiateMultipartUploadRequest initiateMultipartUploadRequest =
                 new InitiateMultipartUploadRequest("bucket", "2022/08/3123/4.avi");
@@ -859,7 +815,7 @@ public class ObjectTest extends TestBase {
      */
     @Test
     public void initiateMultipartUpload_SSE_KMS() {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
         // 创建初始化任务上传
         InitiateMultipartUploadRequest initiateMultipartUploadRequest = new InitiateMultipartUploadRequest("example", "2022/08/16/2.avi");
         // 设置服务端加密
@@ -888,7 +844,7 @@ public class ObjectTest extends TestBase {
      */
     @Test
     public void initiateMultipartUpload_SSE_C() {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
         // 构建初始化任务上传参数
         InitiateMultipartUploadRequest initiateMultipartUploadRequest =
                 new InitiateMultipartUploadRequest("example", "2022/08/31/2.avi");
@@ -919,10 +875,10 @@ public class ObjectTest extends TestBase {
     @Test
     public void partUpload() throws IOException {
         long start = System.currentTimeMillis();
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
         try {
             // 分片上传、完成上传的基础信息
-            String bucketName = "versionbucket";
+            String bucketName = "ncoss-4";
             String key = "aa.avi";
 
             // 构建初始化上传请求参数对象
@@ -972,7 +928,7 @@ public class ObjectTest extends TestBase {
                     new CompleteMultipartUploadRequest(bucketName, key, uploadId, partETags);
             // 完成上传
             CompleteMultipartUploadResult completeMultipartUploadResult = hos.completeMultipartUpload(completeMultipartUploadRequest);
-            System.out.println(System.currentTimeMillis() - start);
+            System.out.println(completeMultipartUploadResult);
         } finally {
             if (hos != null) {
                 hos.shutdown();
@@ -986,7 +942,7 @@ public class ObjectTest extends TestBase {
     @Test
     public void partUpload_SSE_C() throws IOException {
 
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
         String bucketName = "example";
         String key = "2022/08/26/2.avi";
         String uploadId = "5813bc74250411edbeca955b70957396";
@@ -1060,7 +1016,7 @@ public class ObjectTest extends TestBase {
     @Test
     public void listParts() {
         // 构建hos连接
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
         // 桶名称
         String bucketName = "bucket";
         // 对象名称
@@ -1094,7 +1050,7 @@ public class ObjectTest extends TestBase {
     @Test
     public void uploadFile() throws Throwable {
         // 创建HOSClient实例。
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
 
         File file = new File("E:\\devData\\home-space\\myStudy\\bigcomponent\\hadoop\\hadoop-branch-3.3.1\\BP-345915182-172.26.68.47-1692606038655\\current\\rbw\\blk_1073741825");
 
@@ -1149,7 +1105,7 @@ public class ObjectTest extends TestBase {
      */
     @Test
     public void listMultipartUploads() {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
         ListMultipartUploadsRequest listMultipartUploadsRequest = new ListMultipartUploadsRequest("bucket");
         try {
 //            listMultipartUploadsRequest.setMaxKeys(3);
@@ -1175,7 +1131,7 @@ public class ObjectTest extends TestBase {
      */
     @Test
     public void deleteMultipartUploads() {
-        HOS hos = new HOSClientBuilder().build(endPoint, accountId, accessKey, secretKey);
+        HOS hos = getHOSClient();
         // 桶名称
         String bucketName = "example";
         // 对象名称

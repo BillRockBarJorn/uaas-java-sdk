@@ -251,7 +251,7 @@ public class HOSBucketOperation extends HOSOperation {
         populateListVersionsRequestParameters(listVersionsRequest, params);
 
         Map<String, String> headers = new HashMap<String, String>();
-        headers.put(VERSIONS, null);
+//        headers.put(VERSIONS, null);
 
         HOSRequestMessage request = new HOSRequestMessageBuilder(getInnerClient())
                 .setEndpoint(getEndpoint(listVersionsRequest)).setMethod(HttpMethod.GET)
