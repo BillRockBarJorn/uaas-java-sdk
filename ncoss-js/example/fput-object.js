@@ -16,19 +16,11 @@
 
 // Note: YOUR-ACCESSKEYID, YOUR-SECRETACCESSKEY, my-testfile, my-bucketname
 // and my-objectname are dummy values, please replace them with original values.
-
-var NCOSS = require('../dist/main/ncoss')
 const ObjectMetadata = require('../dist/main/ObjectMetadata');
-
-var client = new NCOSS.Client({
-  endPoint: '172.18.232.192',
-  port: 8089,
-  path: '/v1',
-  username: 'test_user1',
-  password: 'TEST#ps@857',
-  scopeName: 'test_pro1',
-  uaasURL: 'http://172.18.232.192:6020/v3/auth/tokens'
-})
+/**
+ * 导入客户端变量
+ */
+var {s3Client, s3ClientV4} = require('./getS3Client')
 
 // 设置元数据
 var objectMetadata = new ObjectMetadata();
@@ -36,10 +28,10 @@ objectMetadata.addUserMetadata('example', 'value');
 objectMetadata.addUserMetadata('example2', 'vlaue2');
 
 // Put a file in bucket my-bucketname.
-var file = 'E:\\比洛巴乔\\Desktop\\aa.avi'
-client.fPutObject('bucket', '2023/04/23/a.avi', file, function (e,res) {
-  if (e) {
-    return console.log(e)
-  }
-  console.log("Success!!!!",res)
+var file = 'E:\\比洛巴乔\\Desktop\\haha2.java'
+s3ClientV4.fPutObject('nodejs', '2023/04/23/a.avi', file, function (e, res) {
+    if (e) {
+        return console.log(e)
+    }
+    console.log("Success!!!!", res)
 })

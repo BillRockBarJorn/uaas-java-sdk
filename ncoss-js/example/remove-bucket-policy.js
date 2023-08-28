@@ -1,6 +1,5 @@
-
 /*
- * MinIO Javascript Library for Amazon S3 Compatible Cloud Storage, (C) 2021 MinIO, Inc.
+ * MinIO Javascript Library for Amazon S3 Compatible Cloud Storage, (C) 2016 MinIO, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,26 +14,17 @@
  * limitations under the License.
  */
 
-// Note: YOUR-ACCESSKEYID, YOUR-SECRETACCESSKEY and my-bucketname are
-// dummy values, please replace them with original values.
+// Note: YOUR-ACCESSKEYID, YOUR-SECRETACCESSKEY, and my-bucketname
+// are dummy values, please replace them with original values.
 
 /**
  * 导入客户端变量
  */
 var {s3Client,s3ClientV4} = require('./getS3Client')
+// Bucket policy - GET requests on "testbucket" bucket will not need authentication.
 
+s3ClientV4.setBucketPolicy('nodejs', "", (err) => {
+	if (err) throw err
 
-s3ClientV4.removeObjectTagging('ncoss-4js', '2023/04/23/a.avi', function (err){
-  if (err) {
-    return console.log(err)
-  }
-  console.log("Success")
+	console.log('Set bucket policy')
 })
-
-// //remove tags on a version of an object
-// client.removeObjectTagging('bucketname', 'object-name', { versionId: "my-object-version-id" }, function (err){
-//   if (err) {
-//     return console.log(err)
-//   }
-//   console.log("Success")
-// })

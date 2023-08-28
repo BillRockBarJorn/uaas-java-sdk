@@ -17,33 +17,18 @@
  // Note: YOUR-ACCESSKEYID, YOUR-SECRETACCESSKEY and my-bucketname are
  // dummy values, please replace them with original values.
 
+/**
+ * 导入客户端变量
+ */
+var {s3Client,s3ClientV4} = require('./getS3Client')
 
-var NCOSS = require('../dist/main/ncoss')
-
-// var s3Client = new NCOSS.Client({
-//   endPoint: '172.18.232.192',
-//   port: 8089,
-//   path: '/v1',
-//   accessKey: 'MTXZY45CMR7ET151L7OV',
-//   secretKey: 'GR3Af1E7o1xosqy6rfBDNE1mmOSzMfjWLhccMMUN',
-//   accountId:'7c9dfff2139b11edbc330391d2a979b2'
-// })
-
-var s3Client = new NCOSS.Client({
-  endPoint: '172.18.232.192',
-  port: 8089,
-  path: '/v1',
-  username: 'test_user1',
-  password: 'TEST#ps@857',
-  scopeName:'test_pro1',
-  uaasURL:'http://172.18.232.192:6020/v3/auth/tokens'
-})
-
-s3Client.bucketExists('bucket', function(err, exists) {
+s3ClientV4.bucketExists('nodejee', function(err, exists) {
   if (err) {
-    return console.log(err)
+    return console.log(exists)
   }
   if (exists) {
       console.log("Bucket exists.")
+  }else{
+    console.log("Bucket false")
   }
 })

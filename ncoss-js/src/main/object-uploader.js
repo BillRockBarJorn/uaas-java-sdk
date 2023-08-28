@@ -120,20 +120,20 @@ export default class ObjectUploader extends Transform {
         objectName: this.objectName
       }
 
-     
+
       this.client.makeRequest(options, chunk, [200], true, (err, response) => {
         if (err) return callback(err)
         let result = {
           etag: sanitizeETag(response.headers.etag),
           versionId: getVersionId(response.headers)
         }
-        
+
         // Ignore the 'data' event so that the stream closes. (nodejs stream requirement)
         response.on('data', () => {})
 
         // Give the etag back, we're done!
 
-        console.log('result::' + result);
+        // console.log('result::' + result);
         process.nextTick(() => {
 
           this.callback(null, result)
@@ -240,7 +240,7 @@ export default class ObjectUploader extends Transform {
     this.client.makeRequest(options, chunk, [200], true, (err, response) => {
       if (err) return callback(err)
       console.log('执行到这了吗');
-      
+
       // In order to aggregate the parts together, we need to collect the etags.
       let etag = response.headers.etag
       if (etag)
@@ -308,7 +308,7 @@ export default class ObjectUploader extends Transform {
         if (err) return callback(err)
 
         console.log('_flush');
-        
+
 
         // Call our callback on the next tick to allow the streams infrastructure
         // to finish what its doing before we continue.

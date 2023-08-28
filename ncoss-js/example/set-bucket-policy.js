@@ -17,69 +17,32 @@
 // Note: YOUR-ACCESSKEYID, YOUR-SECRETACCESSKEY, and my-bucketname
 // are dummy values, please replace them with original values.
 
-var NCOSS = require('../dist/main/ncoss')
-
-// var client = new NCOSS.Client({
-//   endPoint: '172.18.232.192',
-//   port: 8089,
-//   path: '/v1',
-//   accessKey: '312M9HI8IZJ36HYQUWEO',
-//   secretKey: '6HpPGjDHGdGLLTG4UIYyL3lkWqgMuel7zPTUXKf8',
-//   accountId:'7c9dfff2139b11edbc330391d2a979b2'
-// })
-
-var client = new NCOSS.Client({
-  endPoint: '172.18.232.192',
-  port: 8089,
-  path: '/v1',
-  username: 'test_user1',
-  password: 'TEST#ps@857',
-  scopeName:'test_pro1',
-  uaasURL:'http://172.18.232.192:6020/v3/auth/tokens'
-})
-
+/**
+ * 导入客户端变量
+ */
+var {s3Client,s3ClientV4} = require('./getS3Client')
 // Bucket policy - GET requests on "testbucket" bucket will not need authentication.
 var policy = `
 {
-  "Version": "2023-05-17",
-  "Statement": [
-    {
-      "Action": [
-        "ListBucket",
-        "HeadBucket"
-      ],
-      "Effect": "Allow",
-      "Principal": {
-        "HWS": [
-          "7c9dfff2139b11edbc330391d2a979b2:root"
-        ]
-      },
-      "Resource": [
-        "*"
-      ],
-      "Sid": ""
-    },
-    {
-      "Action": [
-        "PutBucketPolicy",
-        "DeleteBucketPolicy"
-      ],
-      "Effect": "Allow",
-      "Principal": {
-        "HWS": [
-          "7c9dfff2139b11edbc330391d2a979b2:root"
-        ]
-      },
-      "Resource": [
-        "*"
-      ],
-      "Sid": ""
-    }
-  ]
+    "Version": "2012-10-17",
+    "Statement": [{
+            "Sid": "sid",
+            "Action": [
+                "ListObjects","HeadBucket","PutBucketPolicy"
+            ],
+            "Effect": "Allow",
+            "Resource": ["*"],
+            "Principal": {
+                "HWS": [
+                    "7c9dfff2139b11edbc330391d2a979b2:root"
+                ]
+            }
+        }
+    ]
 }
 `
 
-client.setBucketPolicy('jssdk', policy, (err) => {
+s3ClientV4.setBucketPolicy('nodejs', policy, (err) => {
 	if (err) throw err
 
 	console.log('Set bucket policy')

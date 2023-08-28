@@ -17,31 +17,14 @@
 // Note: YOUR-ACCESSKEYID, YOUR-SECRETACCESSKEY and my-bucketname are
 // dummy values, please replace them with original values.
 
-var NCOSS = require('../dist/main/ncoss')
-
-// var ncossClient = new NCOSS.Client({
-//   endPoint: '172.18.232.37',
-//   port: 8089,
-//   path: '/v1',
-//   username: 'test_user1',
-//   password: 'TEST#ps@857',
-//   scopeName: 'test_pro1',
-//   uaasURL: 'http://172.18.232.37:7079/v3/auth/tokens'
-// })
-
-var client = new NCOSS.Client({
-  endPoint: '172.18.232.192',
-  port: 8089,
-  path: '/v1',
-  username: 'test_user1',
-  password: 'TEST#ps@857',
-  scopeName: 'test_pro1',
-  uaasURL: 'http://172.18.232.192:6020/v3/auth/tokens'
-})
+/**
+ * 导入客户端变量
+ */
+var {s3Client,s3ClientV4} = require('./getS3Client')
 
 
 // List all object paths in bucket my-bucketname.
-var objectsStream = client.listObjects('bucket', '', true, {
+var objectsStream = s3ClientV4.listObjects('nodejs', '', true, {
   MaxKeys: 20,
   IncludeVersion: true
 })
@@ -53,16 +36,16 @@ objectsStream.on('error', function (e) {
 })
 
 
-// List all object versions in bucket my-bucketname.
-var objectsStreamWithVersions = client.listObjects('jssdk', '', true, {
-  IncludeVersion: true
-})
-objectsStreamWithVersions.on('data', function (obj) {
-  console.log(obj)
-})
-objectsStreamWithVersions.on('error', function (e) {
-  console.log(e)
-})
+// // List all object versions in bucket my-bucketname.
+// var objectsStreamWithVersions = client.listObjects('jssdk', '', true, {
+//   IncludeVersion: true
+// })
+// objectsStreamWithVersions.on('data', function (obj) {
+//   console.log(obj)
+// })
+// objectsStreamWithVersions.on('error', function (e) {
+//   console.log(e)
+// })
 
 
 // // Example to list only the prefixes of a bucket.

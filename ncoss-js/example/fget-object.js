@@ -17,37 +17,21 @@
 // Note: YOUR-ACCESSKEYID, YOUR-SECRETACCESSKEY, my-bucketname and my-objectname
 // are dummy values, please replace them with original values.
 
-var NCOSS = require('../dist/main/ncoss')
+/**
+ * 导入客户端变量
+ */
+var {s3Client,s3ClientV4} = require('./getS3Client')
 
-// var client = new NCOSS.Client({
-//   endPoint: '172.18.232.192',
-//   port: 8089,
-//   path: '/v1',
-//   accessKey: 'F41YDSMIPYGVH8NC0IDM',
-//   secretKey: 'weJFEyw4dv1eiKRtNMAPZLaG3xwWNq0zE2lSzRqL',
-//   accountId:'7c9dfff2139b11edbc330391d2a979b2'
+// // Get a full object.
+// s3ClientV4.fGetObject('ncoss-4js', '2023/04/23/a.avi', 'E:\\比洛巴乔\\Desktop\\hello.avi', function(e) {
+//   if (e) {
+//     return console.log(e)
+//   }
+//   console.log('done')
 // })
 
-var client = new NCOSS.Client({
-  endPoint: '172.18.232.192',
-  port: 8089,
-  path: '/v1',
-  username: 'test_user1',
-  password: 'TEST#ps@857',
-  scopeName: 'test_pro1',
-  uaasURL: 'http://172.18.232.192:6020/v3/auth/tokens'
-})
-
-// Get a full object.
-client.fGetObject('bucket', '2023/04/23/a.avi', 'E:\\比洛巴乔\\Desktop\\新建文件夹\\cc.avi', function(e) {
-  if (e) {
-    return console.log(e)
-  }
-  console.log('done')
-})
-
-//To get a specific version of an object 
-client.fGetObject('my-bucketname', 'my-objectname', '/tmp/objfile', {versionId:"03fd1247-90d9-4b71-a27e-209d484a234b"}, function(e) {
+//To get a specific version of an object
+s3ClientV4.fGetObject('nodejs', '2023/04/23/a.avi', 'b.txt', {versionId:"e209392a457111eeb3a4fa163e2fcf06"}, function(e) {
   if (e) {
     return console.log(e)
   }

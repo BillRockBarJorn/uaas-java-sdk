@@ -19,30 +19,14 @@
 
 var Fs = require('fs')
 
-var NCOSS = require('../dist/main/ncoss');
+/**
+ * 导入客户端变量
+ */
+var {s3Client,s3ClientV4} = require('./getS3Client')
 const ObjectMetadata = require('../dist/main/ObjectMetadata');
 
-// var client = new NCOSS.Client({
-//   endPoint: '172.18.232.192',
-//   port: 8089,
-//   path: '/v1',
-//   accessKey: 'A20FDEGJZWYWWKIL5O56',
-//   secretKey: 'dcOzt9VrOneTRdldueozZJIeVPN7zYAiBUgdhA8V',
-//   accountId: '7c9dfff2139b11edbc330391d2a979b2'
-// })
-
-var client = new NCOSS.Client({
-  endPoint: '172.18.232.192',
-  port: 8089,
-  path: '/v1',
-  username: 'test_user1',
-  password: 'TEST#ps@857',
-  scopeName: 'test_pro1',
-  uaasURL: 'http://172.18.232.192:6020/v3/auth/tokens'
-})
-
 // Upload a stream
-var file = 'localFilePath'
+var file = 'E:\\比洛巴乔\\Desktop\\haha2.java'
 var fileStream = Fs.createReadStream(file);
 
 // 设置元数据
@@ -50,41 +34,44 @@ var objectMetadata = new ObjectMetadata();
 objectMetadata.addUserMetadata('example', 'value');
 objectMetadata.addUserMetadata('example2', 'vlaue2');
 
-var fileStat = Fs.stat(file, function (e, stat) {
-  if (e) {
-    return console.log(e)
-  }
-  client.putObject('jssdk', '2023/04/26/NCOSSFileSystemStore2.avi', fileStream, stat.size, objectMetadata, function (e,result) {
-    if (e) {
-      return console.log(e)
-    }
-    console.log(result);
-    
-    console.log("Successfully uploaded the stream")
-  })
-})
+// var fileStat = Fs.stat(file, function (e, stat) {
+//   if (e) {
+//     return console.log(e)
+//   }
+//   s3ClientV4.putObject('ncoss-4js', 'haha22.java', fileStream, stat.size, objectMetadata, function (e,result) {
+//     if (e) {
+//       return console.log(e)
+//     }
+//     console.log(result);
+//
+//     console.log("Successfully uploaded the stream")
+//   })
+// })
 
-// Upload a buffer
-var buf = new Buffer(10)
-buf.fill('a')
-client.putObject('bucket', '2023/04/18/bbb.txt', buf, 'application/octet-stream', function(e) {
-  if (e) {
-    return console.log(e)
-  }
-  console.log("Successfully uploaded the buffer")
-})
+// // Upload a buffer
+// var buf = new Buffer(10)
+// buf.fill('a')
+// s3ClientV4.putObject('ncoss-4js', 'buffer.txt', buf, 'application/octet-stream', function(e) {
+//   if (e) {
+//     return console.log(e)
+//   }
+//   console.log("Successfully uploaded the buffer")
+// })
 
-// Upload a string
-var str = "random string to be uploaded"
-client.putObject('bucket', '2023/04/18/ccc.txt', str, 'text/plain', function(e) {
-  if (e) {
-    return console.log(e)
-  }
-  console.log("Successfully uploaded the string")
-})
+// // Upload a string
+// var str = "random string to be uploaded"
+// s3ClientV4.putObject('ncoss-4js', 'string.txt', str, 'text/plain', function(e) {
+//   if (e) {
+//     return console.log(e)
+//   }
+//   console.log("Successfully uploaded the string")
+// })
+
 
 // Upload a Buffer without content-type (default: 'application/octet-stream')
-client.putObject('bucket', '2023/04/18/ddd.txt', buf, function(e) {
+var buf1 = new Buffer(10)
+buf1.fill('a')
+s3ClientV4.putObject('ncoss-4js', 'string3.txt', buf1, function(e) {
   if (e) {
     return console.log(e)
   }

@@ -18,15 +18,13 @@
 // Note: YOUR-ACCESSKEYID, YOUR-SECRETACCESSKEY, my-bucketname
 // and my-objectname are dummy values, please replace them with original values.
 
-var Minio = require('minio')
+/**
+ * 导入客户端变量
+ */
+var {s3Client,s3ClientV4} = require('./getS3Client')
 
-var s3Client = new Minio.Client({
-  endPoint: 's3.amazonaws.com',
-  accessKey: 'YOUR-ACCESSKEYID',
-  secretKey: 'YOUR-SECRETACCESSKEY'
-})
 // Get stat information for my-objectname.
-s3Client.statObject('my-bucketname', 'my-objectname', function(e, stat) {
+s3Client.statObject('ncoss-4js', 'string3.txt', function(e, stat) {
   if (e) {
     return console.log(e)
   }
@@ -35,9 +33,9 @@ s3Client.statObject('my-bucketname', 'my-objectname', function(e, stat) {
 
 // Get stat information for a specific version of 'my-objectname'
 //Bucket must be versioning enabled.
-s3Client.statObject('my-bucketname', 'my-objectname', {versionId:"my-uuid"},function(e, stat) {
-  if (e) {
-    return console.log(e)
-  }
-  console.log(stat)
-})
+// s3Client.statObject('ncoss-4js', 'string3.txt', {versionId:"b4be6b04430d11eeb3a4fa163e2fcf06"},function(e, stat) {
+//   if (e) {
+//     return console.log(e)
+//   }
+//   console.log(stat)
+// })

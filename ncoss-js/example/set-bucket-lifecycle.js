@@ -17,28 +17,10 @@
 // Note: YOUR-ACCESSKEYID, YOUR-SECRETACCESSKEY and my-bucketname are
 // dummy values, please replace them with original values.
 
-var NCOSS = require('../dist/main/ncoss')
-
-// var client = new NCOSS.Client({
-//   endPoint: '172.18.232.192',
-//   port: 8089,
-//   path: '/v1',
-//   accessKey: '7UWXIA4M146E3GRXT138',
-//   secretKey: 'X2z8l0flnGrLhQ4imawq5MKNe494Um5CrGO7kBXv',
-//   accountId: '7c9dfff2139b11edbc330391d2a979b2'
-// })
-
-
-var client = new NCOSS.Client({
-  endPoint: '172.18.232.192',
-  port: 8089,
-  path: '/v1',
-  username: 'test_user1',
-  password: 'TEST#ps@857',
-  scopeName:'test_pro1',
-  uaasURL:'http://172.18.232.192:6020/v3/auth/tokens'
-})
-
+/**
+ * 导入客户端变量
+ */
+var {s3Client,s3ClientV4} = require('./getS3Client')
 
 const lifecycleConfig= {
   Rule: [{
@@ -62,7 +44,7 @@ const lifecycleConfig= {
   ]
 }
 
-client.setBucketLifecycle('jssdk',lifecycleConfig, function (err) {
+s3Client.setBucketLifecycle('ncoss-4js',lifecycleConfig, function (err) {
   if (err) {
     return console.log(err)
   }
@@ -88,7 +70,7 @@ client.setBucketLifecycle('jssdk',lifecycleConfig, function (err) {
 // }
 
 
-// client.setBucketLifecycle('bucket',lifecycleConfigWithExpirationDate, function (err) {
+// s3Client.setBucketLifecycle('bucket',lifecycleConfigWithExpirationDate, function (err) {
 //   if (err) {
 //     return console.log(err)
 //   }

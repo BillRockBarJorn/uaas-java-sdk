@@ -17,28 +17,9 @@
 // Note: YOUR-ACCESSKEYID, YOUR-SECRETACCESSKEY and my-bucketname are
 // dummy values, please replace them with original values.
 
-var NCOSS = require('../dist/main/ncoss')
+var {s3Client, s3ClientV4} = require('./getS3Client')
 
-// var client = new NCOSS.Client({
-//   endPoint: '172.18.232.192',
-//   port: 8089,
-//   path: '/v1',
-//   accessKey: '312M9HI8IZJ36HYQUWEO',
-//   secretKey: '6HpPGjDHGdGLLTG4UIYyL3lkWqgMuel7zPTUXKf8',
-//   accountId:'7c9dfff2139b11edbc330391d2a979b2'
-// })
-
-var client = new NCOSS.Client({
-  endPoint: '172.18.232.192',
-  port: 8089,
-  path: '/v1',
-  username: 'test_user1',
-  password: 'TEST#ps@857',
-  scopeName: 'test_pro1',
-  uaasURL: 'http://172.18.232.192:6020/v3/auth/tokens'
-})
-
-client.getAccountQuota(function (err, res) {
+s3ClientV4.getAccountQuota(function (err, res) {
   if (err) {
     return console.log(err)
   }

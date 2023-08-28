@@ -17,26 +17,10 @@
 // Note: YOUR-ACCESSKEYID, YOUR-SECRETACCESSKEY and my-bucketname are
 // dummy values, please replace them with original values.
 
-var NCOSS = require('../dist/main/ncoss')
-
-// var client = new NCOSS.Client({
-//   endPoint: '172.18.232.192',
-//   port: 8089,
-//   path: '/v1',
-//   accessKey: 'H4OAXD042VFNDV13UNEC',
-//   secretKey: 'KLkG5MdKTO7lAp19zOWYeFcVkEKhicZzAoZ8Ip5j',
-//   accountId: '7c9dfff2139b11edbc330391d2a979b2'
-// })
-
-var client = new NCOSS.Client({
-  endPoint: '172.18.232.192',
-  port: 8089,
-  path: '/v1',
-  username: 'test_user1',
-  password: 'TEST#ps@857',
-  scopeName:'test_pro1',
-  uaasURL:'http://172.18.232.192:6020/v3/auth/tokens'
-})
+/**
+ * 导入客户端变量
+ */
+var {s3Client,s3ClientV4} = require('./getS3Client')
 
 var ACL = {}
 // 设置拥有者信息
@@ -69,7 +53,7 @@ accessControlList.push(accessControl1)
 accessControlList.push(accessControl2)
 ACL['accessControlList'] = accessControlList
 
-client.setObjectACL('jssdk', '2023/04/20/b.txt', ACL, function (err) {
+s3ClientV4.setObjectACL('nodejs', '2023/04/23/a.avi', ACL, function (err) {
   if (err) {
     return console.log(err)
   }

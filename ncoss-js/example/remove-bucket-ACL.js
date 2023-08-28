@@ -20,7 +20,7 @@
 /**
  * 导入客户端变量
  */
-var {s3Client,s3ClientV4} = require('./getS3Client')
+var {s3Client, s3ClientV4} = require('./getS3Client')
 
 var ACL = {}
 // 设置拥有者信息
@@ -68,9 +68,11 @@ ACL['accessControlList'] = accessControlList
 //   console.log("Success")
 // })
 
+
+const ACLString = '<AccessControlPolicy><Owner><ID>7c9dfff2139b11edbc330391d2a979b2</ID></Owner><AccessControlList><Grant><Grantee xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="CanonicalUser"><ID>7c9dfff2139b11edbc330391d2a979b2</ID></Grantee><Permission>READ</Permission></Grant><Grant><Grantee xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="Group"><URI>http://www.heredata.com/groups/global/AllUsers</URI></Grantee><Permission>WRITE</Permission></Grant></AccessControlList></AccessControlPolicy>';
 s3ClientV4.setBucketACL('nodejs', "", function (err) {
-  if (err) {
-    return console.log(err)
-  }
-  console.log("Success")
+    if (err) {
+        return console.log(err)
+    }
+    console.log("Success")
 })

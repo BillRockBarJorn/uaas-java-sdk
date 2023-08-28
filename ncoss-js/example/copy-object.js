@@ -18,27 +18,11 @@
 // my-src-bucketname and my-src-objectname are dummy values, please replace
 // them with original values.
 
-var NCOSS = require('../dist/main/ncoss')
+/**
+ * 导入客户端变量
+ */
+var {s3Client,s3ClientV4} = require('./getS3Client')
 var ObjectMetadata = require('../dist/main/ObjectMetadata')
-
-// var client = new NCOSS.Client({
-//   endPoint: '172.18.232.192',
-//   port: 8089,
-//   path: '/v1',
-//   accessKey: 'EL5CG1OX6HEOSQ5YAJYL',
-//   secretKey: 'ljCUFFBNwJCYDYzZnpcXYbWSc6L29aypEXJ36dJY',
-//   accountId: '7c9dfff2139b11edbc330391d2a979b2'
-// })
-
-var client = new NCOSS.Client({
-  endPoint: '172.18.232.192',
-  port: 8089,
-  path: '/v1',
-  username: 'test_user1',
-  password: 'TEST#ps@857',
-  scopeName:'test_pro1',
-  uaasURL:'http://172.18.232.192:6020/v3/auth/tokens'
-})
 
 // 创建对象元数据
 var objectMetadata = new ObjectMetadata({});
@@ -49,7 +33,7 @@ objectMetadata.addUserMetadata('meta3', 'value3');
 objectMetadata.setObjectDirective('REPLACE_NEW'); // 设置复制类型
 
 // 调用函数进行复制
-client.copyObject('bucket', '2023/04/21/dest.txt', 'bucket', '2023/04/18/ccc.txt', objectMetadata, function (e, data) {
+s3ClientV4.copyObject('ncoss-5js', '2023/04/21/dest.txt', 'ncoss-4js', '2023/04/23/a.avi', objectMetadata, function (e, data) {
   if (e) {
     return console.log(e)
   }

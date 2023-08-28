@@ -18,41 +18,23 @@
 // Note: YOUR-ACCESSKEYID, YOUR-SECRETACCESSKEY, my-bucketname and
 // my-objectname are dummy values, please replace them with original values.
 
-var NCOSS = require('../dist/main/ncoss')
+/**
+ * 导入客户端变量
+ */
+var {s3Client,s3ClientV4} = require('./getS3Client')
 
-
-// var client = new NCOSS.Client({
-//   endPoint: '172.18.232.192',
-//   port: 8089,
-//   path: '/v1',
-//   accessKey: 'EL5CG1OX6HEOSQ5YAJYL',
-//   secretKey: 'ljCUFFBNwJCYDYzZnpcXYbWSc6L29aypEXJ36dJY',
-//   accountId: '7c9dfff2139b11edbc330391d2a979b2'
-// })
-
-
-var client = new NCOSS.Client({
-  endPoint: '172.18.232.192',
-  port: 8089,
-  path: '/v1',
-  username: 'test_user1',
-  password: 'TEST#ps@857',
-  scopeName:'test_pro1',
-  uaasURL:'http://172.18.232.192:6020/v3/auth/tokens'
-})
-
-// Remove an object name my-objectname.
-client.removeObject('jssdk', '2023/04/20/c.txt', function(e) {
-  if (e) {
-    return console.log(e)
-  }
-  console.log("Success")
-})
-
-// // Remove an object with name 'my-objectname' and a versionId.
-// client.removeObject('my-bucketname', 'my-objectname', {versionId:"my-versionId"}, function(e) {
+// // Remove an object name my-objectname.
+// s3ClientV4.removeObject('ncoss-4js', 'string3.txt', function(e) {
 //   if (e) {
 //     return console.log(e)
 //   }
 //   console.log("Success")
 // })
+
+// Remove an object with name 'my-objectname' and a versionId.
+s3ClientV4.removeObject('nodejs', '2023/04/23/a.avi', {versionId:"e209392a457111eeb3a4fa163e2fcf06"}, function(e) {
+  if (e) {
+    return console.log(e)
+  }
+  console.log("Success")
+})
