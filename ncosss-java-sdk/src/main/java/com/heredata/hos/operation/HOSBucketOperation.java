@@ -554,7 +554,7 @@ public class HOSBucketOperation extends HOSOperation {
         }
 
         if (listObjectsRequest.getStartAfter() != null) {
-            params.put(START_AFTER, listObjectsRequest.getStartAfter());
+            params.put(START_AFTER, urlEncodeKey(listObjectsRequest.getStartAfter()));
         }
         if (listObjectsRequest.getMaxKeys() != null) {
             params.put(MAX_KEYS, Integer.toString(listObjectsRequest.getMaxKeys()));

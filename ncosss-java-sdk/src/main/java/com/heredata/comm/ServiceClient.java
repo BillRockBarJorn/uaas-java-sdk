@@ -109,12 +109,13 @@ public abstract class ServiceClient {
                 // Step 2. 构建http请求参数实体   并且将context添加到request中
                 Request httpRequest = buildRequest(request, context);
 
-                LogUtils.getLog().info("requestURL：：" + httpRequest.uri+"  method:"+httpRequest.method+"  headers:"+httpRequest.getHeaders());
 
                 // Step 3. Send HTTP request to HOS.
                 String poolStatsInfo = config.isLogConnectionPoolStatsEnable() ? "Connection pool stats " + getConnectionPoolStats() : "";
                 long startTime = System.currentTimeMillis();
+                LogUtils.getLog().info("requestURL：：" + httpRequest.uri + "  method:" + httpRequest.method + "  headers:" + httpRequest.getHeaders());
                 response = sendRequestCore(httpRequest, context);
+                LogUtils.getLog().info("response code::" + response.getStatusCode());
                 long duration = System.currentTimeMillis() - startTime;
                 if (duration > config.getSlowRequestsThreshold()) {
                     LogUtils.getLog().warn(formatSlowRequestLog(request, response, duration) + poolStatsInfo);

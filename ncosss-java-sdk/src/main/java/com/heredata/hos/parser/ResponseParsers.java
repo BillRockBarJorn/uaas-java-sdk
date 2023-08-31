@@ -322,6 +322,7 @@ public final class ResponseParsers {
             HOSObject.setRequestId(response.getHeaders().get(HOS_HEADER_REQUEST_ID));
             HOSObject.setResponse(response);
             HOSObject.setMimeType(response.getHeaders().get(CONTENT_TYPE));
+            HOSObject.setSize(response.getContentLength());
             try {
                 HOSObject.setLastModified(DateUtil.parseGMTDate(response.getHeaders().get(LAST_MODIFIED)));
             } catch (ParseException e) {
@@ -619,7 +620,7 @@ public final class ResponseParsers {
                 } catch (ParseException e) {
                     log.error("解析时间戳出错", e.getMessage());
                 }
-                HOSObjectSummary.setETag(eTag);
+                HOSObjectSummary.setETag(eTag.substring(1, eTag.length() - 1));
                 HOSObjectSummary.setSize(isNullOrEmpty(size) ? null : Long.valueOf(size));
                 HOSObjectSummary.setStorageClass(storageClass);
                 result.getObjectSummaries().add(HOSObjectSummary);
@@ -1201,9 +1202,9 @@ public final class ResponseParsers {
         try {
             Element root = getXmlRootElement(responseBody);
             TagSet tagSet = new TagSet();
-            if(root.getChild("TagSet")!=null && root.getChild("TagSet").getChildren("Tag")!=null){
+            if (root.getChild("TagSet") != null && root.getChild("TagSet").getChildren("Tag") != null) {
 
-            List<Element> tagElems = root.getChild("TagSet").getChildren("Tag");
+                List<Element> tagElems = root.getChild("TagSet").getChildren("Tag");
 
                 for (Element tagElem : tagElems) {
                     String key = null;
