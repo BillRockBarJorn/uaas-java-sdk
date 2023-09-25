@@ -63,13 +63,33 @@ public class HOSUtils {
     /**
      * Validate bucket name.
      */
-    public static boolean validateBucketName(String bucketName) {
+    public static boolean validateBucketName(String bucket) {
 
-        if (bucketName == null) {
+        if (bucket == null) {
             return false;
         }
 
-        return bucketName.matches(BUCKET_NAMING_REGEX);
+
+        // bucket length should be less than and no more than 63
+        // characters long.
+        if (bucket.length() < 3 || bucket.length() > 255) {
+            return false;
+        }
+        // bucket with successive periods is invalid.
+        if (bucket.indexOf("..") > -1 || bucket.indexOf(".-")>-1 || bucket.indexOf("-.")>-1) {
+            return false;
+        }
+        // bucket cannot have ip address style.
+        if (bucket.matches("[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+")) {
+            return false;
+        }
+
+        // bucket should begin with alphabet/number and end with alphabet/number,
+        // with alphabet/number/.- in the middle.
+        if (bucket.matches("^[a-z0-9][a-z0-9.-]+[a-z0-9]$")) {
+            return true;
+        }
+        return false;
     }
 
     public static void ensureBucketNameValid(String bucketName) {
