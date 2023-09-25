@@ -20,9 +20,9 @@
 /**
  * 导入客户端变量
  */
-var {s3Client,s3ClientV4} = require('./getS3Client')
+var {s3Client,s3ClientV4,s3ClientV4Key} = require('./getS3Client')
 
-s3ClientV4.listBuckets(function(e, buckets) {
+s3ClientV4Key.listBuckets(function(e, buckets) {
   if (e) return console.log(e)
   console.log('buckets :', buckets)
 })

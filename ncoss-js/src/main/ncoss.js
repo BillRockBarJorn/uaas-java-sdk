@@ -106,7 +106,7 @@ export class Client {
     constructor(params) {
         // 判断使用是永久秘钥还是临时秘钥
         this.isPermanentKey = undefined;
-        if (params.accessKey && params.secretKey && params.accountId) {
+        if (params.accessKey && params.secretKey) {
             this.isPermanentKey = true;
             this.keyObj = {
                 accessKey: params.accessKey,
