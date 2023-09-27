@@ -108,7 +108,7 @@ public class HOSUtils {
             return false;
         }
 
-        return bucketName.matches(BUCKET_NAMING_CREATION_REGEX);
+        return validateBucketName(bucketName);
     }
 
     public static void ensureBucketNameCreationValid(String bucketName) {
