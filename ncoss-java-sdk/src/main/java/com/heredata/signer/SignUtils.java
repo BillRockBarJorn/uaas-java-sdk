@@ -1,9 +1,10 @@
-package com.heredata.hos.signer;
+package com.heredata.signer;
 
 
 import com.heredata.HttpHeaders;
 import com.heredata.comm.RequestMessage;
 import com.heredata.hos.comm.HOSHeaders;
+import com.heredata.hos.signer.SignParameters;
 
 import java.util.Arrays;
 import java.util.Map;

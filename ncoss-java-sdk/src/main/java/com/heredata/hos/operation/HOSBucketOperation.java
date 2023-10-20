@@ -6,7 +6,7 @@ import com.heredata.exception.ClientException;
 import com.heredata.exception.ExceptionFactory;
 import com.heredata.exception.ServiceException;
 import com.heredata.hos.HOSErrorCode;
-import com.heredata.hos.auth.CredentialsProvider;
+import com.heredata.auth.CredentialsProvider;
 import com.heredata.hos.comm.HOSRequestMessage;
 import com.heredata.hos.comm.HOSRequestParameters;
 import com.heredata.hos.handler.HOSRequestMessageBuilder;

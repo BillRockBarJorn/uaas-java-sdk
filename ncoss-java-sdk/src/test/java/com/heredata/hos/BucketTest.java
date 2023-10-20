@@ -403,7 +403,7 @@ public class BucketTest extends TestBase {
     public void setBucketLifecycle() {
         HOS hos = getHOSClient();
 
-        SetBucketLifecycleRequest setBucketLifecycleRequest = new SetBucketLifecycleRequest("ncoss-4");
+        SetBucketLifecycleRequest setBucketLifecycleRequest = new SetBucketLifecycleRequest("ncoss-10");
         LifecycleRule lifecycleRule = new LifecycleRule();
         // 设置过滤器，对哪些对象进行生命周期设置
         LifecycleRule.Filter filter = new LifecycleRule.Filter();
@@ -447,7 +447,7 @@ public class BucketTest extends TestBase {
     public void getBucketLifecycle() {
         HOS hos = getHOSClient();
         try {
-            List<LifecycleRule> result = hos.getBucketLifecycle("ncoss-4");
+            List<LifecycleRule> result = hos.getBucketLifecycle("ncoss-10");
             System.out.println(result);
         } catch (ServiceException oe) {
             System.out.println("Error Message:" + oe.getErrorMessage());

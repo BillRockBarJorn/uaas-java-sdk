@@ -1,5 +1,7 @@
 package com.heredata.hos.auth;
 
+import com.heredata.auth.Credentials;
+import com.heredata.auth.CredentialsProvider;
 import com.heredata.exception.InvalidCredentialsException;
 
 /**

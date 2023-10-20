@@ -1,5 +1,6 @@
 package com.heredata.hos.auth;
 
+import com.heredata.auth.Credentials;
 import com.heredata.exception.InvalidCredentialsException;
 
 /**
@@ -53,5 +54,10 @@ public class DefaultCredentials implements Credentials {
     @Override
     public String getAccountId() {
         return accountId;
+    }
+
+    @Override
+    public String getToken() {
+        throw new RuntimeException("DefaultCredentials hasn't token.");
     }
 }

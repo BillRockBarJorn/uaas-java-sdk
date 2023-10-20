@@ -3,7 +3,7 @@ package com.heredata.swift.operation;
 import com.heredata.comm.HttpMethod;
 import com.heredata.comm.RequestMessage;
 import com.heredata.comm.ServiceClient;
-import com.heredata.swift.auth.CredentialsProvider;
+import com.heredata.auth.CredentialsProvider;
 import com.heredata.swift.comm.SWIFTRequestMessage;
 import com.heredata.swift.comm.SwiftRequestParameters;
 import com.heredata.swift.internal.RequestMessageBuilder;

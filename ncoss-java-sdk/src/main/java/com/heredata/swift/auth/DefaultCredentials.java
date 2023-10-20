@@ -1,6 +1,7 @@
 package com.heredata.swift.auth;
 
 
+import com.heredata.auth.Credentials;
 import com.heredata.exception.InvalidCredentialsException;
 
 /**
@@ -30,6 +31,16 @@ public class DefaultCredentials implements Credentials {
     }
 
     @Override
+    public String getAccessKey() {
+        return null;
+    }
+
+    @Override
+    public String getSecretKey() {
+        return null;
+    }
+
+    @Override
     public String getAccount() {
         return account;
     }
@@ -37,5 +48,10 @@ public class DefaultCredentials implements Credentials {
     @Override
     public boolean useAccount() {
         return this.account != null;
+    }
+
+    @Override
+    public String getAccountId() {
+        return this.account;
     }
 }

@@ -1,10 +1,10 @@
 package com.heredata.hos.signer;
 
 
-import com.heredata.auth.RequestSigner;
+import com.heredata.signer.RequestSigner;
 import com.heredata.comm.RequestMessage;
 import com.heredata.exception.ClientException;
-import com.heredata.hos.auth.Credentials;
+import com.heredata.auth.Credentials;
 import com.heredata.hos.comm.HOSHeaders;
 import com.heredata.utils.DateUtil;
 
@@ -61,7 +61,6 @@ public class HOSUaasSigner implements RequestSigner {
 
     public String hamcSha1(String input) throws NoSuchAlgorithmException, InvalidKeyException, UnsupportedEncodingException {
         SecretKeySpec signingKey = new SecretKeySpec(signerParams.getCredentials().getSecretKey().getBytes(DEFAULT_ENCODING), "HmacSHA1");
-//        SecretKeySpec signingKey = new SecretKeySpec("rf2SbuWBSNb2yNskBdLV7YVzLCVMJUhSi0Incdcz".getBytes(DEFAULT_ENCODING), "HmacSHA1");
         Mac mac = Mac.getInstance("HmacSHA1");
         mac.init(signingKey);
 
@@ -108,13 +107,6 @@ public class HOSUaasSigner implements RequestSigner {
             }
         }
         stringToSign.append(resourcePath);
-//        if (!isNullOrEmpty(requestMessage.getBucket())) {
-//            stringToSign.append(requestMessage.getBucket());
-//            if (!isNullOrEmpty(requestMessage.getKey())) {
-//                stringToSign.append("/").append(requestMessage.getKey());
-//            }
-//        }
-
 
         Map<String, String> parameters = requestMessage.getParameters();
         TreeMap<String, String> canonicalizedResource = new TreeMap<>();

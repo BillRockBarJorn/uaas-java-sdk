@@ -29,13 +29,14 @@ public class TestBase {
     @BeforeClass
     public static void oneTiemUp() {
 
+
         KeyInformation keyInformation = new KeyInformation();
-        keyInformation.setEndPoint("http://10.30.52.249:31722/HOSv1/");  // 该endpoint适用ncoss-4.*版本的,请同步修改com.heredata.hos.TestBase.getHOSClient
+        keyInformation.setEndPoint("http://172.18.232.37:8089/HOSv1/");  // 该endpoint适用ncoss-4.*版本的,请同步修改com.heredata.hos.TestBase.getHOSClient
 //        keyInformation.setEndPoint("http://172.18.232.192:8089/v1/"); // 该endpoint适用ncoss-3.*版本,请同步修改com.heredata.hos.TestBase.getHOSClient
         try {
-            keyInformation.setKeyInformation("hs_hs-1695742827153", "1083df3b0ac2403dae02435df0d0b78d"
-                    , "hs_hs-1695742827153"
-                    , "http://10.30.52.248:30919/v1/auth/tokens");
+            keyInformation.setKeyInformation("test_user1", "TEST#ps@857"
+                    , "test_pro1"
+                    , "http://172.18.232.192:6020/v3/auth/tokens");
             System.out.println("AccessKey=" + keyInformation.getAccessKey());
             System.out.println("SecretKey=" + keyInformation.getSecretKey());
             System.out.println("Token=" + keyInformation.getXSubjectToken());

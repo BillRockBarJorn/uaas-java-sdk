@@ -2,15 +2,15 @@ package com.heredata.hos.operation;
 
 import com.heredata.ClientConfiguration;
 import com.heredata.ResponseMessage;
-import com.heredata.auth.RequestSigner;
+import com.heredata.signer.RequestSigner;
 import com.heredata.comm.*;
 import com.heredata.exception.ClientException;
 import com.heredata.exception.ExceptionFactory;
 import com.heredata.exception.ResponseParseException;
 import com.heredata.exception.ServiceException;
 import com.heredata.handler.*;
-import com.heredata.hos.auth.Credentials;
-import com.heredata.hos.auth.CredentialsProvider;
+import com.heredata.auth.Credentials;
+import com.heredata.auth.CredentialsProvider;
 import com.heredata.hos.handler.HOSErrorResponseHandler;
 import com.heredata.hos.parser.ResponseParsers.EmptyResponseParser;
 import com.heredata.hos.parser.ResponseParsers.RequestIdResponseParser;

@@ -1,7 +1,7 @@
 package com.heredata.swift.operation;
 
 import com.heredata.ResponseMessage;
-import com.heredata.auth.RequestSigner;
+import com.heredata.signer.RequestSigner;
 import com.heredata.comm.*;
 import com.heredata.exception.ClientException;
 import com.heredata.exception.ExceptionFactory;
@@ -11,7 +11,7 @@ import com.heredata.handler.*;
 import com.heredata.model.WebServiceRequest;
 import com.heredata.parser.ResponseParser;
 import com.heredata.request.NoRetryStrategy;
-import com.heredata.swift.auth.CredentialsProvider;
+import com.heredata.auth.CredentialsProvider;
 import com.heredata.swift.handler.SwiftErrorResponseHandler;
 import com.heredata.swift.parser.ResponseParsers.EmptyResponseParser;
 import com.heredata.swift.parser.ResponseParsers.RequestIdResponseParser;

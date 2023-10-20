@@ -7,7 +7,7 @@ import com.heredata.exception.ServiceException;
 import com.heredata.model.VoidResult;
 import com.heredata.request.DefaultServiceClient;
 import com.heredata.request.TimeoutServiceClient;
-import com.heredata.swift.auth.CredentialsProvider;
+import com.heredata.auth.CredentialsProvider;
 import com.heredata.swift.model.*;
 import com.heredata.swift.model.bucket.*;
 import com.heredata.swift.operation.SwiftAccountOperation;

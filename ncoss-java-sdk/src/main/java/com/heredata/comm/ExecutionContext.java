@@ -1,6 +1,6 @@
 package com.heredata.comm;
 
-import com.heredata.auth.RequestSigner;
+import com.heredata.signer.RequestSigner;
 import com.heredata.handler.RequestHandler;
 import com.heredata.handler.ResponseHandler;
 import lombok.AllArgsConstructor;

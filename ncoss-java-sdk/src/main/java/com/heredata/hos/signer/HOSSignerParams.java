@@ -1,6 +1,6 @@
 package com.heredata.hos.signer;
 
-import com.heredata.hos.auth.Credentials;
+import com.heredata.auth.Credentials;
 import lombok.Data;
 
 /**

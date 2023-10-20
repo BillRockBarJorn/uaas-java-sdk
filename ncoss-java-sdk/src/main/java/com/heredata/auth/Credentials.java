@@ -1,4 +1,4 @@
-package com.heredata.hos.auth;
+package com.heredata.auth;
 
 /**
  * Provides access to credentials used for accessing HOS, these credentials are
@@ -26,4 +26,10 @@ public interface Credentials {
     public boolean useAccount();
 
     public String getAccountId();
+
+    /**
+     * returns the account's token
+     * @return
+     */
+    public String getToken();
 }

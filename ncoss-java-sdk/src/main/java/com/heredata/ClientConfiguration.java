@@ -1,6 +1,6 @@
 package com.heredata;
 
-import com.heredata.auth.RequestSigner;
+import com.heredata.signer.RequestSigner;
 import com.heredata.comm.IdleConnectionReaper;
 import com.heredata.comm.Protocol;
 import com.heredata.comm.RetryStrategy;

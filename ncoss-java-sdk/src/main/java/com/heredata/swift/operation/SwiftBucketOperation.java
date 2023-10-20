@@ -5,7 +5,7 @@ import com.heredata.comm.ServiceClient;
 import com.heredata.exception.ClientException;
 import com.heredata.exception.ServiceException;
 import com.heredata.model.VoidResult;
-import com.heredata.swift.auth.CredentialsProvider;
+import com.heredata.auth.CredentialsProvider;
 import com.heredata.swift.comm.SWIFTRequestMessage;
 import com.heredata.swift.internal.RequestMessageBuilder;
 import com.heredata.swift.model.*;

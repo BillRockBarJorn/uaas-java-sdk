@@ -1,4 +1,4 @@
-package com.heredata.swift.auth;
+package com.heredata.auth;
 
 /**
  * Abstract credentials provider that maintains only one user credentials. Users

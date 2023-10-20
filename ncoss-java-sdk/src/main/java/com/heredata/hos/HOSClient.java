@@ -4,7 +4,7 @@ import com.heredata.ClientConfiguration;
 import com.heredata.comm.ServiceClient;
 import com.heredata.exception.ClientException;
 import com.heredata.exception.ServiceException;
-import com.heredata.hos.auth.CredentialsProvider;
+import com.heredata.auth.CredentialsProvider;
 import com.heredata.hos.model.*;
 import com.heredata.hos.model.bucket.Bucket;
 import com.heredata.hos.model.bucket.BucketList;

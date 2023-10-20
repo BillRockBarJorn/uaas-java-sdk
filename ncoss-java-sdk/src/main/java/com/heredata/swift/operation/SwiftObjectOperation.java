@@ -12,7 +12,7 @@ import com.heredata.handler.ResponseHandler;
 import com.heredata.model.VoidResult;
 import com.heredata.parser.ResponseParser;
 import com.heredata.swift.SwiftErrorCode;
-import com.heredata.swift.auth.CredentialsProvider;
+import com.heredata.auth.CredentialsProvider;
 import com.heredata.swift.comm.SWIFTRequestMessage;
 import com.heredata.swift.comm.SwiftHeaders;
 import com.heredata.swift.handler.SwiftCallbackErrorResponseHandler;

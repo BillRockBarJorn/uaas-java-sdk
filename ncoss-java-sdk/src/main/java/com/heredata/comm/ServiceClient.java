@@ -3,7 +3,7 @@ package com.heredata.comm;
 import com.heredata.ClientConfiguration;
 import com.heredata.HttpHeaders;
 import com.heredata.ResponseMessage;
-import com.heredata.auth.RequestSigner;
+import com.heredata.signer.RequestSigner;
 import com.heredata.exception.ClientException;
 import com.heredata.exception.ServiceException;
 import com.heredata.handler.RequestHandler;

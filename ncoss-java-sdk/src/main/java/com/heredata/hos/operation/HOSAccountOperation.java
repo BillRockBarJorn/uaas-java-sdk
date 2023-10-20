@@ -2,7 +2,7 @@ package com.heredata.hos.operation;
 
 import com.heredata.comm.HttpMethod;
 import com.heredata.comm.ServiceClient;
-import com.heredata.hos.auth.CredentialsProvider;
+import com.heredata.auth.CredentialsProvider;
 import com.heredata.hos.comm.HOSRequestMessage;
 import com.heredata.hos.handler.HOSRequestMessageBuilder;
 import com.heredata.hos.model.AccountInfo;
