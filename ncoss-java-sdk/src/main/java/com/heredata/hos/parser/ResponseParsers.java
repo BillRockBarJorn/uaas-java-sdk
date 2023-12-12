@@ -242,6 +242,7 @@ public final class ResponseParsers {
         public ListObjectsReponseParser(String bucketName) {
             this.bucketName = bucketName;
         }
+
         @Override
         public ObjectListing parse(ResponseMessage response) throws ResponseParseException {
             try {
@@ -1239,9 +1240,10 @@ public final class ResponseParsers {
             Map<String, String> headers = response.getHeaders();
             String bytesUsed = headers.get("x-hos-bytes-used");
             String objectCount = headers.get("x-hos-object-count");
+            Date date = DateUtil.parseGMTDate(headers.get("Date"));
             bucket.setBytesUsed(isNullOrEmpty(bytesUsed) ? 0 : Long.valueOf(bytesUsed));
             bucket.setObjectCount(isNullOrEmpty(objectCount) ? 0 : Integer.valueOf(objectCount));
-
+            bucket.setCreationDate(date);
             return bucket;
         } catch (Exception e) {
             throw new ResponseParseException(e.getMessage(), e);

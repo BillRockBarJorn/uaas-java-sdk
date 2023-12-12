@@ -12,6 +12,8 @@ import org.springframework.core.io.ClassPathResource;
 
 import javax.activation.MimetypesFileTypeMap;
 import java.io.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -20,6 +22,18 @@ import java.util.*;
  * @since 2022/8/4
  */
 public class ObjectTest extends TestBase {
+
+
+    @Test
+    public void test222() {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            Date parse = simpleDateFormat.parse("2023-07-08 ");
+            System.out.println(parse);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Test
     public void test1() throws IOException {

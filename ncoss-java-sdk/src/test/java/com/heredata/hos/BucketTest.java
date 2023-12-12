@@ -56,10 +56,10 @@ public class BucketTest extends TestBase {
     public void getBucketDetail() {
         HOS hos = getHOSClient();
         try {
-            if (hos.doesBucketExist("ncoss-4")) {
+            if (hos.doesBucketExist("ncoss-3")) {
 
                 //查询桶名为"example"的详情
-                Bucket bucket = hos.getBucketInfo("ncoss-4");
+                Bucket bucket = hos.getBucketInfo("ncoss-3");
                 System.out.println(bucket);
             }else{
                 System.out.println("桶不存在");
