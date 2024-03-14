@@ -1,8 +1,11 @@
 package com.heredata.hos.parser;
 
+import com.heredata.exception.ClientException;
 import com.heredata.hos.model.*;
 import com.heredata.hos.model.DeleteVersionsRequest.KeyVersion;
 import com.heredata.parser.Marshaller;
+import com.heredata.utils.DateUtil;
+import com.heredata.utils.StringUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -54,30 +57,63 @@ public final class RequestMarshallers {
         @Override
         public byte[] marshall(SetBucketLifecycleRequest request) {
 
-            LifecycleRule rule = request.getLifecycleRules().get(0);
-
             StringBuffer xmlBody = new StringBuffer();
             xmlBody.append("<LifecycleConfiguration>");
-            xmlBody.append("<Rule>");
-            xmlBody.append("<ID>" + rule.getId() + "</ID>");
-            xmlBody.append("<Filter>");
-            xmlBody.append("<Prefix>" + rule.getFilter().getPrefix() + "</Prefix>");
-            xmlBody.append("</Filter>");
-            if (rule.getStatus() == LifecycleRule.RuleStatus.Enabled) {
-                xmlBody.append("<Status>Enabled</Status>");
-            } else {
-                xmlBody.append("<Status>Disabled</Status>");
+            for (int i = 0; i < request.getLifecycleRules().size(); i++) {
+                LifecycleRule rule = request.getLifecycleRules().get(i);
+                xmlBody.append("<Rule>");
+                if (!StringUtils.isNullOrEmpty(rule.getId())) {
+                    xmlBody.append("<ID>" + rule.getId() + "</ID>");
+                }
+                xmlBody.append("<Filter>");
+                xmlBody.append("<Prefix>" + rule.getFilter().getPrefix() + "</Prefix>");
+                xmlBody.append("</Filter>");
+                if (rule.getStatus() == LifecycleRule.RuleStatus.Enabled) {
+                    xmlBody.append("<Status>Enabled</Status>");
+                } else {
+                    xmlBody.append("<Status>Disabled</Status>");
+                }
+                if (rule.getExpiration() != null) {
+                    xmlBody.append("<Expiration>");
+                    if (rule.getExpiration().getDays() != null) {
+                        if (rule.getTransitions() != null && !rule.getTransitions().isEmpty() && rule.getTransitions().get(0).getDays() != null) {
+                            if (rule.getExpiration().getDays() <= rule.getTransitions().get(0).getDays()) {
+                                throw new ClientException("expiration not <= transition");
+                            }
+                        }
+                        xmlBody.append("<Days>" + rule.getExpiration().getDays() + "</Days>");
+                    }
+                    if (rule.getExpiration().getDate() != null) {
+                        if (rule.getTransitions() != null && !rule.getTransitions().isEmpty() && rule.getTransitions().get(0).getDate() != null) {
+                            if (rule.getExpiration().getDate().getTime() <= rule.getTransitions().get(0).getDate().getTime()) {
+                                throw new ClientException("expiration not <= transition");
+                            }
+                        }
+                        xmlBody.append("<Date>" + DateUtil.formatIso8601Date(rule.getExpiration().getDate()) + "</Date>");
+                    }
+                    if (rule.getExpiration().getExpiredObjectDeleteMarker() != null) {
+                        xmlBody.append("<ExpiredObjectDeleteMarker>" + rule.getExpiration().getExpiredObjectDeleteMarker() + "</ExpiredObjectDeleteMarker>");
+                    }
+                    xmlBody.append("</Expiration>");
+                }
+
+                if (rule.getTransitions() != null && !rule.getTransitions().isEmpty()) {
+                    xmlBody.append("<Transition>");
+                    if (rule.getTransitions().get(0).getDays() != null) {
+                        xmlBody.append("<Days>" + rule.getTransitions().get(0).getDays() + "</Days>");
+                    }
+                    if (rule.getTransitions().get(0).getDate() != null) {
+                        xmlBody.append("<Date>" + DateUtil.formatIso8601Date(rule.getTransitions().get(0).getDate()) + "</Date>");
+                    }
+                    if (rule.getTransitions().get(0).getStorageClass() != null) {
+                        xmlBody.append("<StorageClass>" + rule.getTransitions().get(0).getStorageClass().toString() + "</StorageClass>");
+                    }
+                    xmlBody.append("</Transition>");
+                }
+
+                xmlBody.append("</Rule>");
             }
-            xmlBody.append("<Expiration>");
-            xmlBody.append("<Days>" + rule.getExpiration().getDays() + "</Days>");
-            xmlBody.append("</Expiration>");
 
-            xmlBody.append("<Transition>");
-            xmlBody.append("<Days>" + rule.getTransitions().get(0).getDays() + "</Days>");
-            xmlBody.append("<StorageClass>" + "ARCHIVE" + "</StorageClass>");
-            xmlBody.append("</Transition>");
-
-            xmlBody.append("</Rule>");
             xmlBody.append("</LifecycleConfiguration>");
             return stringToByteArray(xmlBody.toString());
         }

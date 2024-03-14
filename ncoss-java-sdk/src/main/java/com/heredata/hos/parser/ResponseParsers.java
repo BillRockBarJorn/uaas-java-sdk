@@ -474,6 +474,7 @@ public final class ResponseParsers {
                 result.setETag(response.getHeaders().get(ETAG));
                 result.setVersionId(response.getHeaders().get(HOS_HEADER_VERSION_ID));
                 result.setRequestId(response.getRequestId());
+                result.setResponse(response);
 //                setServerCRC(result, response);
                 return result;
             } finally {
@@ -1381,7 +1382,7 @@ public final class ResponseParsers {
                 if (ruleElem.getChild("Expiration") != null) {
                     LifecycleRule.Expiration expiration = new LifecycleRule.Expiration();
                     if (ruleElem.getChild("Expiration").getChild("Date") != null) {
-                        expiration.setDate(DateUtil.parseIso8601Date(ruleElem.getChild("Expiration").getChildText("Date")).toString());
+                        expiration.setDate(DateUtil.parseIso8601Date(ruleElem.getChild("Expiration").getChildText("Date")));
                     }
                     if (ruleElem.getChild("Expiration").getChild("Days") != null) {
                         expiration.setDays(Integer.parseInt(ruleElem.getChild("Expiration").getChildText("Days")));
@@ -1411,7 +1412,7 @@ public final class ResponseParsers {
                     } else if (transitionElem.getChild("Date") != null) {
                         Date date = DateUtil
                                 .parseIso8601Date(transitionElem.getChildText("Date"));
-                        transition.setCreatedBeforeDate(date);
+                        transition.setDate(date);
                     }
                     if (transitionElem.getChild("StorageClass") != null) {
                         transition

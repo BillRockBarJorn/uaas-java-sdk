@@ -72,7 +72,6 @@ public class LifecycleRule {
      */
     @Data
     @AllArgsConstructor
-    @NoArgsConstructor
     public static class Expiration {
         /**
          * 指定对象过期时间，单位days（天），以对象最后更新时间为准，向后计算过期时间。
@@ -83,7 +82,7 @@ public class LifecycleRule {
          * 指定一个日期，HOS会对最后更新时间早于该日期的数据执行生命周期规则。日期必须服从ISO8601的格式，且要求是UTC的零点。
          * 例：2021-07-23T5:00:00.000 实际北京时间 + 8 为  2021-07-23T13:00:00.000。
          */
-        private String date;
+        private Date date;
 
         /**
          * 对象删除标记过期，有效值 ”true ”，与 Days 冲突。
@@ -93,6 +92,9 @@ public class LifecycleRule {
         public Expiration(Integer days, Boolean expiredObjectDeleteMarker) {
             this.days = days;
             this.expiredObjectDeleteMarker = expiredObjectDeleteMarker;
+        }
+
+        public Expiration() {
         }
     }
 
@@ -148,7 +150,7 @@ public class LifecycleRule {
         /**
          *指定一个日期，HOS会对最后更新时间早于该日期的数据执行生命周期规则
          */
-        private Date createdBeforeDate;
+        private Date date;
 
         /**
          * 指定Object转储的存储类型。 {@link StorageClass}
