@@ -24,9 +24,11 @@ import org.jdom2.input.JDOMParseException;
 import org.jdom2.input.SAXBuilder;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.*;
 import java.util.zip.CheckedInputStream;
@@ -1326,22 +1328,26 @@ public final class ResponseParsers {
     }
 
     /**
+     * 修复漏洞3.1.1.2    漏洞来源代码扫描报告-cmstoreos-sdk-java-1215-0b57751a.pdf
      * Unmarshall get bucket policy response body .
      */
     public static GetBucketPolicyResult parseGetBucketPolicy(InputStream responseBody) throws ResponseParseException {
-
+        int len;
+        byte[] buffer = new byte[10 * 1024];
         try {
-            GetBucketPolicyResult result = new GetBucketPolicyResult();
-
-            BufferedReader reader = new BufferedReader(new InputStreamReader(responseBody));
-            StringBuilder sb = new StringBuilder();
-
-            String s;
-            while ((s = reader.readLine()) != null) {
-                sb.append(s);
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            while ((len = responseBody.read(buffer)) != -1) {
+                os.write(buffer, 0, len);
             }
-            result.setPolicyText(sb.toString());
 
+            StringBuilder sb = new StringBuilder();
+            byte[] bytes = os.toByteArray();
+            if (bytes.length > 0) {
+                sb.append(new String(bytes, StandardCharsets.UTF_8));
+            }
+
+            GetBucketPolicyResult result = new GetBucketPolicyResult();
+            result.setPolicyText(sb.toString());
             return result;
         } catch (Exception e) {
             throw new ResponseParseException(e.getMessage(), e);

@@ -28,28 +28,10 @@ public class BinaryUtil {
         return Base64.decodeBase64(base64String);
     }
 
-    public static byte[] calculateMd5(byte[] binaryData) {
-        MessageDigest messageDigest = null;
-        try {
-            messageDigest = MessageDigest.getInstance("MD5");
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("MD5 algorithm not found.");
-        }
-        messageDigest.update(binaryData);
-        return messageDigest.digest();
-    }
-
-    public static String encodeMD5(byte[] binaryData) {
-        byte[] md5Bytes = calculateMd5(binaryData);
-        int len = md5Bytes.length;
-        char buf[] = new char[len * 2];
-        for (int i = 0; i < len; i++) {
-            buf[i * 2] = HEX_DIGITS[(md5Bytes[i] >>> 4) & 0x0f];
-            buf[i * 2 + 1] = HEX_DIGITS[md5Bytes[i] & 0x0f];
-        }
-        return new String(buf);
-    }
-
+    /**
+     * 修复漏洞3.2.1.1   漏洞来源代码扫描报告-cmstoreos-sdk-java-1215-0b57751a.pdf
+     * 之前是使用MD5，现在将MD5的工具类已做删除，采用sha256算法
+     */
     public static byte[] calculateSha256(byte[] binaryData) {
         MessageDigest messageDigest = null;
         try {

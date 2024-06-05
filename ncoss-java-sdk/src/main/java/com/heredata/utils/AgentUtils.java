@@ -43,6 +43,9 @@ public class AgentUtils {
         return defaultUserAgent;
     }
 
+    /**
+     * 修复漏洞3.2.2.1  资源没有安全释放  漏洞来源代码扫描报告-cmstoreos-sdk-java-1215-0b57751a.pdf
+     */
     private static void initializeVersion() {
         InputStream inputStream = AgentUtils.class.getClassLoader().getResourceAsStream(VERSION_INFO_FILE);
         Properties versionInfoProperties = new Properties();
@@ -50,12 +53,13 @@ public class AgentUtils {
             if (inputStream == null) {
                 throw new IllegalArgumentException(VERSION_INFO_FILE + " not found on classpath");
             }
-
             versionInfoProperties.load(inputStream);
             version = versionInfoProperties.getProperty("version");
         } catch (Exception e) {
             logException("Unable to load version information for the running SDK: ", e);
             version = "unknown-version";
+        } finally {
+            IOUtils.safeCloseStream(inputStream);
         }
     }
 }

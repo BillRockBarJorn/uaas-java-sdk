@@ -11,6 +11,7 @@ import com.heredata.hos.internal.Mimetypes;
 import com.heredata.hos.model.*;
 import com.heredata.hos.utils.HOSUtils;
 import com.heredata.utils.CRC64;
+import com.heredata.utils.IOUtils;
 import lombok.Data;
 
 import java.io.*;
@@ -36,7 +37,7 @@ import static com.heredata.utils.LogUtils.logException;
  */
 public class HOSUploadOperation {
 
-    protected UploadCheckPoint createUploadCheckPointWrap() {
+    protected UploadCheckPoint createUploadCheckPointWrap() throws IOException {
         return new UploadCheckPoint();
     }
 
@@ -58,22 +59,41 @@ public class HOSUploadOperation {
         return multipartOperation.completeMultipartUpload(request);
     }
 
-    static class UploadCheckPoint implements Serializable {
-
-        private static final long serialVersionUID = 5424904565837227164L;
+    /**
+     * 修复漏洞3.1.1.1    漏洞来源代码扫描报告-cmstoreos-sdk-java-1215-0b57751a.pdf
+     * 断点续传的实体类，包含断点续传的所有属性信息用来完成此功能
+     */
+    static class UploadCheckPoint extends ObjectInputStream {
 
         private static final String UPLOAD_MAGIC = "FE8BB4EA-B593-4FAC-AD7A-2459A36E2E62";
 
+        protected UploadCheckPoint() throws IOException, SecurityException {
+        }
+
+        @Override
+        protected Class<?> resolveClass(ObjectStreamClass osc) throws IOException, ClassNotFoundException {
+            if (!osc.getName().equals(UploadCheckPoint.class.getName())) {
+                throw new InvalidClassException("Unauthorized deserialization", osc.getName());
+            }
+            return super.resolveClass(osc);
+        }
+
         /**
+         * 修复漏洞3.2.2.1  资源没有安全释放
          * Gets the checkpoint data from the checkpoint file.
          */
         public synchronized void load(String cpFile) throws IOException, ClassNotFoundException {
-            FileInputStream fileIn = new FileInputStream(cpFile);
-            ObjectInputStream in = new ObjectInputStream(fileIn);
-            UploadCheckPoint ucp = (UploadCheckPoint) in.readObject();
-            assign(ucp);
-            in.close();
-            fileIn.close();
+            FileInputStream fileIn = null;
+            ObjectInputStream in = null;
+            try {
+                fileIn = new FileInputStream(cpFile);
+                in = new ObjectInputStream(fileIn);
+                UploadCheckPoint ucp = (UploadCheckPoint) in.readObject();
+                assign(ucp);
+            } finally {
+                IOUtils.safeCloseStream(fileIn);
+                IOUtils.safeCloseStream(in);
+            }
         }
 
         /**
@@ -475,9 +495,7 @@ public class HOSUploadOperation {
                 tr.setException(e);
                 logException(String.format("Task %d:%s upload part %d failed: ", id, name, partIndex + 1), e);
             } finally {
-                if (instream != null) {
-                    instream.close();
-                }
+                IOUtils.safeCloseStream(instream);
             }
 
             return tr;

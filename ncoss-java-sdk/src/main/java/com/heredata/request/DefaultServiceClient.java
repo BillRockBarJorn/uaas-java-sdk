@@ -11,6 +11,7 @@ import com.heredata.exception.ServiceException;
 import com.heredata.hos.HOSErrorCode;
 import com.heredata.utils.HttpUtil;
 import com.heredata.utils.IOUtils;
+import com.heredata.utils.LogUtils;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.Header;
 import org.apache.http.HttpHost;
@@ -39,6 +40,7 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.*;
 import java.io.ByteArrayInputStream;
@@ -203,7 +205,7 @@ public class DefaultServiceClient extends ServiceClient {
 
             if (response != null) {
                 Integer statusCode = response.getStatusCode();
-                if (statusCode!=null) {
+                if (statusCode != null) {
                     if (statusCode == HttpStatus.SC_INTERNAL_SERVER_ERROR || statusCode == HttpStatus.SC_BAD_GATEWAY ||
                             statusCode == HttpStatus.SC_SERVICE_UNAVAILABLE) {
                         return true;
@@ -331,6 +333,7 @@ public class DefaultServiceClient extends ServiceClient {
                 return m;
             }
         } catch (Exception e) {
+            LogUtils.getLog().warn("getClassMethd()----clazz:" + clazz.toString() + "  methodName:" + methodName);
         }
         return null;
     }
@@ -341,6 +344,7 @@ public class DefaultServiceClient extends ServiceClient {
                     Class.forName("org.apache.http.client.config.RequestConfig$Builder"),
                     "setNormalizeUri");
         } catch (Exception e) {
+            LogUtils.getLog().warn("getClassMethd faile");
         }
     }
 
@@ -377,6 +381,7 @@ public class DefaultServiceClient extends ServiceClient {
                     return; // someone trusts them. success!
                 } catch (CertificateException e) {
                     // maybe someone else will trust them
+                    LogUtils.getLog().warn("chain:" + Arrays.toString(chain) + "  authType:" + authType);
                 }
             }
             throw new CertificateException("None of the TrustManagers trust this certificate chain");

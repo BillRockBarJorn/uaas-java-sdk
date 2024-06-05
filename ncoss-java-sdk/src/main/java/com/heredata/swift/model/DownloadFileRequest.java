@@ -93,7 +93,7 @@ public class DownloadFileRequest extends GenericRequest {
 
     public String getTempDownloadFile() {
         if (getVersionId() != null) {
-            return downloadFile + "." + BinaryUtil.encodeMD5(getVersionId().getBytes()) + ".tmp";
+            return downloadFile + "." + BinaryUtil.calculateSha256(getVersionId().getBytes()) + ".tmp";
         } else {
             return downloadFile + ".tmp";
         }

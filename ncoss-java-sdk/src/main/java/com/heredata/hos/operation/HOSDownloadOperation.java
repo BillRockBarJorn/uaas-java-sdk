@@ -57,21 +57,44 @@ public class HOSDownloadOperation {
         return object.getObjectContent();
     }
 
-    static class DownloadCheckPoint implements Serializable {
+    /**
+     * 修复漏洞3.1.1.2    漏洞来源代码扫描报告-cmstoreos-sdk-java-1215-0b57751a.pdf
+     */
+    static class DownloadCheckPoint extends ObjectInputStream {
 
-        private static final long serialVersionUID = 4682293344365787077L;
         private static final String DOWNLOAD_MAGIC = "92611BED-89E2-46B6-89E5-72F273D4B0A3";
 
+        public DownloadCheckPoint() throws IOException {
+            super();
+        }
+
         /**
+         * 在内部设置白名单机制，只允许序列化已知的类。
+         */
+        @Override
+        protected Class<?> resolveClass(ObjectStreamClass osc) throws IOException, ClassNotFoundException {
+            if (!osc.getName().equals(DownloadCheckPoint.class.getName())) {
+                throw new InvalidClassException("Unauthorized deserialization", osc.getName());
+            }
+            return super.resolveClass(osc);
+        }
+
+        /**
+         * 修复漏洞3.2.2.1  资源没有安全释放  漏洞来源代码扫描报告-cmstoreos-sdk-java-1215-0b57751a.pdf
          * Loads the checkpoint data from the checkpoint file.
          */
         public synchronized void load(String cpFile) throws IOException, ClassNotFoundException {
-            FileInputStream fileIn = new FileInputStream(cpFile);
-            ObjectInputStream in = new ObjectInputStream(fileIn);
-            DownloadCheckPoint dcp = (DownloadCheckPoint) in.readObject();
-            assign(dcp);
-            in.close();
-            fileIn.close();
+            FileInputStream fileIn = null;
+            ObjectInputStream in = null;
+            try {
+                fileIn = new FileInputStream(cpFile);
+                in = new ObjectInputStream(fileIn);
+                DownloadCheckPoint dcp = (DownloadCheckPoint) in.readObject();
+                assign(dcp);
+            } finally {
+                IOUtils.safeCloseStream(in);
+                IOUtils.safeCloseStream(fileIn);
+            }
         }
 
         /**
@@ -362,7 +385,7 @@ public class HOSDownloadOperation {
                 String versionId = downloadFileRequest.getVersionId();
                 if (versionId != null) {
                     downloadFileRequest.setCheckpointFile(downloadFileRequest.getDownloadFile() + "."
-                            + BinaryUtil.encodeMD5(versionId.getBytes()) + ".dcp");
+                            + BinaryUtil.calculateSha256(versionId.getBytes()) + ".dcp");
                 } else {
                     downloadFileRequest.setCheckpointFile(downloadFileRequest.getDownloadFile() + ".dcp");
                 }

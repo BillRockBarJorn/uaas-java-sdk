@@ -19,6 +19,7 @@ import com.heredata.hos.parser.ResponseParsers;
 import com.heredata.hos.utils.HOSUtils;
 import com.heredata.model.VoidResult;
 import com.heredata.model.WebServiceRequest;
+import com.heredata.utils.IOUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -327,6 +328,9 @@ public class HOSMultipartOperation extends HOSOperation {
         } catch (RuntimeException e) {
             publishProgress(listener, ProgressEventType.TRANSFER_PART_FAILED_EVENT);
             throw e;
+        } finally {
+            // 修复漏洞3.2.2.1  资源没有安全释放  漏洞来源代码扫描报告-cmstoreos-sdk-java-1215-0b57751a.pdf
+            IOUtils.safeCloseStream(repeatableInputStream);
         }
 
         UploadPartResult result = new UploadPartResult();

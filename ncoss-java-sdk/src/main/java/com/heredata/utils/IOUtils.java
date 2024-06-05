@@ -3,6 +3,7 @@ package com.heredata.utils;
 import com.heredata.comm.io.BoundedInputStream;
 import com.heredata.comm.io.RepeatableBoundedFileInputStream;
 import com.heredata.comm.io.RepeatableFileInputStream;
+import lombok.NonNull;
 
 import java.io.*;
 import java.util.zip.CheckedInputStream;
@@ -153,6 +154,9 @@ public class IOUtils {
         return n;
     }
 
+    /**
+     * 修复漏洞3.2.2.1  资源没有安全释放  漏洞来源代码扫描报告-cmstoreos-sdk-java-1215-0b57751a.pdf
+     */
     public static boolean writeOutFile(InputStream is, String destinationFile) throws IOException {
         File file = new File(destinationFile);
         if (!file.exists()) {
@@ -162,15 +166,33 @@ public class IOUtils {
                 throw new RuntimeException("创建" + destinationFile + "文件失败");
             }
         }
-        FileOutputStream fileOutputStream = new FileOutputStream(file);
-        int len = -1;
-        byte[] arr = new byte[1024];
-        while ((len = is.read(arr)) != -1) {
-            fileOutputStream.write(arr, 0, len);
+
+        FileOutputStream fileOutputStream = null;
+        try {
+            fileOutputStream = new FileOutputStream(file);
+            int len = -1;
+            byte[] arr = new byte[1024];
+            while ((len = is.read(arr)) != -1) {
+                fileOutputStream.write(arr, 0, len);
+            }
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            safeCloseStream(fileOutputStream);
+            safeCloseStream(is);
         }
-        fileOutputStream.close();
-        is.close();
         return true;
+    }
+
+
+    public static void safeCloseStream(@NonNull final Closeable os) {
+        if (os != null) {
+            try {
+                os.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 }
