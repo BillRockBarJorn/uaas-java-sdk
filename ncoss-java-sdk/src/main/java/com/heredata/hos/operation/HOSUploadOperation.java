@@ -63,7 +63,9 @@ public class HOSUploadOperation {
      * 修复漏洞3.1.1.1    漏洞来源代码扫描报告-cmstoreos-sdk-java-1215-0b57751a.pdf
      * 断点续传的实体类，包含断点续传的所有属性信息用来完成此功能
      */
-    static class UploadCheckPoint extends ObjectInputStream {
+    static class UploadCheckPoint extends ObjectInputStream implements Serializable {
+
+        private static final long serialVersionUID = 5424904565837227164L;
 
         private static final String UPLOAD_MAGIC = "FE8BB4EA-B593-4FAC-AD7A-2459A36E2E62";
 

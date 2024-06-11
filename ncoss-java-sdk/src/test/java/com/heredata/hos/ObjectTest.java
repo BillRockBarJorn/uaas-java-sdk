@@ -131,7 +131,7 @@ public class ObjectTest extends TestBase {
 //            ListObjectsRequest prefixQuery = new ListObjectsRequest("hadoop","BP-1991540692-172.26.68.47-1692611683831/current/rbw",);
 //            prefixQuery.setPrefix("prefix");
 //            prefixQuery.setStartAfter("2023/04/26");
-            ObjectListing example1 = hos.listObjects("ncoss-3", "a");
+            ObjectListing example1 = hos.listObjects("jssdk6");
             example1.getObjectSummaries().stream().forEach(item -> System.out.println(item.getKey()));
             System.out.println("================================");
 //
@@ -420,7 +420,7 @@ public class ObjectTest extends TestBase {
     public void downLoadObject() throws Throwable {
         HOS hos = getHOSClient();
         try {
-            DownloadFileRequest downloadFileRequest = new DownloadFileRequest("ncoss-4", "aa.avi");
+            DownloadFileRequest downloadFileRequest = new DownloadFileRequest("jssdk6", "2022/08/3123/4.avi");
 //            downloadFileRequest.setVersionId("4182cc941c7411eeac37c7c965b9af79");
             // 开启断点下载
             downloadFileRequest.setEnableCheckpoint(true);
@@ -443,6 +443,8 @@ public class ObjectTest extends TestBase {
             System.out.println("Host ID:" + oe.getHostId());
         } catch (ClientException ce) {
             System.out.println("Error Message:" + ce.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             if (hos != null) {
                 hos.shutdown();

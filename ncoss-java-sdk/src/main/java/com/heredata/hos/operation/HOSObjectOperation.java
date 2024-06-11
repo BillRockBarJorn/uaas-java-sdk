@@ -833,7 +833,7 @@ public class HOSObjectOperation extends HOSOperation {
     private static void addDeleteObjectsRequiredHeaders(Map<String, String> headers, byte[] rawContent) {
         headers.put(CONTENT_LENGTH, String.valueOf(rawContent.length));
 
-        byte[] md5 = BinaryUtil.calculateMd5(rawContent);
+        byte[] md5 = BinaryUtil.calculateSha256(rawContent);
         String md5Base64 = BinaryUtil.toBase64String(md5);
         headers.put(HttpHeaders.CONTENT_MD5, md5Base64);
     }

@@ -60,7 +60,9 @@ public class HOSDownloadOperation {
     /**
      * 修复漏洞3.1.1.2    漏洞来源代码扫描报告-cmstoreos-sdk-java-1215-0b57751a.pdf
      */
-    static class DownloadCheckPoint extends ObjectInputStream {
+    static class DownloadCheckPoint extends ObjectInputStream implements Serializable{
+
+        private static final long serialVersionUID = 4682293344365787077L;
 
         private static final String DOWNLOAD_MAGIC = "92611BED-89E2-46B6-89E5-72F273D4B0A3";
 
