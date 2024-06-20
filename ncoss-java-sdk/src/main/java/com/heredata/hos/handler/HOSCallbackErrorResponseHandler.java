@@ -9,7 +9,6 @@ import com.heredata.handler.ResponseHandler;
 import com.heredata.model.ErrorResult;
 import com.heredata.parser.JAXBResponseParser;
 import org.apache.http.HttpStatus;
-import org.apache.poi.ss.formula.functions.T;
 
 import static com.heredata.utils.ResourceUtils.safeCloseResponse;
 
@@ -22,7 +21,7 @@ import static com.heredata.utils.ResourceUtils.safeCloseResponse;
  * @version 1.0.0
  * @createtime 2022/10/27 16:12
  */
-public class HOSCallbackErrorResponseHandler implements ResponseHandler {
+public class HOSCallbackErrorResponseHandler<T> implements ResponseHandler<T> {
 
     @Override
     public void handle(ResponseMessage response, Class<T> responseClass) throws ServiceException, ClientException {

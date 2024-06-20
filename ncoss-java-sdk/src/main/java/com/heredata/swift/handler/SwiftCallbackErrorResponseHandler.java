@@ -9,12 +9,11 @@ import com.heredata.handler.ResponseHandler;
 import com.heredata.model.ErrorResult;
 import com.heredata.parser.JAXBResponseParser;
 import org.apache.http.HttpStatus;
-import org.apache.poi.ss.formula.functions.T;
 
 import static com.heredata.utils.ResourceUtils.safeCloseResponse;
 
 
-public class SwiftCallbackErrorResponseHandler implements ResponseHandler {
+public class SwiftCallbackErrorResponseHandler<T> implements ResponseHandler<T> {
 
     @Override
     public void handle(ResponseMessage response) throws ServiceException, ClientException {

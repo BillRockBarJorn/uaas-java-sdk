@@ -10,7 +10,6 @@ import com.heredata.model.ErrorResult;
 import com.heredata.parser.JAXBResponseParser;
 import com.heredata.swift.SwiftErrorCode;
 import org.apache.http.HttpStatus;
-import org.apache.poi.ss.formula.functions.T;
 
 import static com.heredata.utils.ResourceUtils.safeCloseResponse;
 
@@ -20,7 +19,7 @@ import static com.heredata.utils.ResourceUtils.safeCloseResponse;
  * then throws <code>SwiftException</code> with detailed error information(such as
  * request id, error code).
  */
-public class SwiftErrorResponseHandler implements ResponseHandler {
+public class SwiftErrorResponseHandler<T> implements ResponseHandler<T> {
     @Override
     public void handle(ResponseMessage response) throws ServiceException, ClientException {
 

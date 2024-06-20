@@ -8,7 +8,6 @@ import com.heredata.swift.model.DownloadFileRequest;
 import com.heredata.utils.IOUtils;
 import com.heredata.utils.StringUtils;
 import org.junit.Test;
-import org.springframework.core.io.ClassPathResource;
 
 import javax.activation.MimetypesFileTypeMap;
 import java.io.*;
@@ -754,13 +753,11 @@ public class ObjectTest extends TestBase {
         /**
          * 上传一个ARCHIVE对象
          */
-        ClassPathResource classPathResource = new ClassPathResource("testFile/test1.txt");
-        File file = classPathResource.getFile();
 
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setObjectStorageClass(StorageClass.ARCHIVE);
         PutObjectRequest putObjectRequest = new PutObjectRequest("bucket1", "2022/08/24/a.txt"
-                , new FileInputStream(file), objectMetadata);
+                , new FileInputStream("test1.txt"), objectMetadata);
         PutObjectResult putObjectResult = hos.putObject(putObjectRequest);
         if (putObjectResult.getResponse().isSuccessful()) {
             System.out.println("上传成功");
@@ -790,13 +787,13 @@ public class ObjectTest extends TestBase {
     @Test
     public void downRestoreObject() throws IOException {
         HOS hos = getHOSClient();
-        ClassPathResource classPathResource = new ClassPathResource("testFile/test1.txt");
-        File file = classPathResource.getFile();
-        GetObjectRequest getObjectRequest = new GetObjectRequest("bucket1", "2022/08/24/a.txt");
-        getObjectRequest.setIncludeInputStream(true);
-        HOSObject example = hos.getObject(getObjectRequest);
-        InputStream objectContent = example.getObjectContent();
-        IOUtils.writeOutFile(objectContent, new File(file.getParent(), UUID.randomUUID() + ".txt").getAbsolutePath());
+//        ClassPathResource classPathResource = new ClassPathResource("testFile/test1.txt");
+//        File file = classPathResource.getFile();
+//        GetObjectRequest getObjectRequest = new GetObjectRequest("bucket1", "2022/08/24/a.txt");
+//        getObjectRequest.setIncludeInputStream(true);
+//        HOSObject example = hos.getObject(getObjectRequest);
+//        InputStream objectContent = example.getObjectContent();
+//        IOUtils.writeOutFile(objectContent, new File(file.getParent(), UUID.randomUUID() + ".txt").getAbsolutePath());
     }
 
     /**

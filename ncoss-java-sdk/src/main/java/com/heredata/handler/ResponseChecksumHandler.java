@@ -5,7 +5,6 @@ import com.heredata.ResponseMessage;
 import com.heredata.exception.ClientException;
 import com.heredata.exception.ServiceException;
 import com.heredata.utils.CRC64;
-import org.apache.poi.ss.formula.functions.T;
 
 import java.io.InputStream;
 import java.util.zip.CheckedInputStream;
@@ -19,7 +18,7 @@ import java.util.zip.CheckedInputStream;
  * @version 1.0.0
  * @createtime 2022/10/27 14:07
  */
-public class ResponseChecksumHandler implements ResponseHandler {
+public class ResponseChecksumHandler<T> implements ResponseHandler<T> {
 
     @Override
     public void handle(ResponseMessage response) throws ServiceException, ClientException {

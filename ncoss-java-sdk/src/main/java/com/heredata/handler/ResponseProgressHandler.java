@@ -9,7 +9,6 @@ import com.heredata.exception.ClientException;
 import com.heredata.exception.ServiceException;
 import com.heredata.model.WebServiceRequest;
 import com.heredata.utils.LogUtils;
-import org.apache.poi.ss.formula.functions.T;
 
 import java.io.InputStream;
 import java.util.Map;
@@ -23,7 +22,7 @@ import java.util.Map;
  * @version 1.0.0
  * @createtime 2022/10/27 14:15
  */
-public class ResponseProgressHandler implements ResponseHandler {
+public class ResponseProgressHandler<T> implements ResponseHandler<T> {
 
     private final WebServiceRequest originalRequest;
 

@@ -3,9 +3,8 @@ package com.heredata.handler;
 import com.heredata.ResponseMessage;
 import com.heredata.exception.ClientException;
 import com.heredata.exception.ServiceException;
-import org.apache.poi.ss.formula.functions.T;
 
-public interface ResponseHandler {
+public interface ResponseHandler<T> {
 
     void handle(ResponseMessage response) throws ServiceException, ClientException;
 
