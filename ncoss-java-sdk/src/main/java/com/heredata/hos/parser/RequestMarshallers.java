@@ -66,7 +66,12 @@ public final class RequestMarshallers {
                     xmlBody.append("<ID>" + rule.getId() + "</ID>");
                 }
                 xmlBody.append("<Filter>");
-                xmlBody.append("<Prefix>" + rule.getFilter().getPrefix() + "</Prefix>");
+                if (rule.getFilter().getPrefix() != null) {
+                    xmlBody.append("<Prefix>" + rule.getFilter().getPrefix() + "</Prefix>");
+                }
+                if (rule.getFilter().getTag() != null) {
+                    xmlBody.append("<Tag>" + rule.getFilter().getTag() + "</Tag>");
+                }
                 xmlBody.append("</Filter>");
                 if (rule.getStatus() == LifecycleRule.RuleStatus.Enabled) {
                     xmlBody.append("<Status>Enabled</Status>");

@@ -91,9 +91,9 @@ public class UploadPartRequest extends GenericRequest {
      * @param partSize
      */
     public void setPartSize(long partSize) {
-        if (partSize <= 1024 * 100) {
-            partSize = defaultPartSize;
-        }
+//        if (partSize <= 1024 * 100) {
+//            partSize = defaultPartSize;
+//        }
         this.partSize = partSize;
     }
 

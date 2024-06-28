@@ -44,7 +44,6 @@ import static com.heredata.utils.StringUtils.*;
 /*
  * A collection of parsers that parse HTTP reponses into corresponding human-readable results.
  */
-@Slf4j
 public final class ResponseParsers {
 
     public static final ListBucketResponseParser listBucketResponseParser = new ListBucketResponseParser();
@@ -329,7 +328,7 @@ public final class ResponseParsers {
             try {
                 HOSObject.setLastModified(DateUtil.parseGMTDate(response.getHeaders().get(LAST_MODIFIED)));
             } catch (ParseException e) {
-                log.error("时间字符串解析失败" + e.getMessage());
+                throw new ResponseParseException(e.getMessage(), e);
             }
             try {
                 HOSObject.setETag(response.getHeaders().get(ETAG));
@@ -602,10 +601,8 @@ public final class ResponseParsers {
             result.setMaxKeys(maxKeys == null ? 0 : Integer.valueOf(maxKeys));
             result.setTruncated(isTruncated == null ? false : Boolean.valueOf(isTruncated));
 
-//            throw new JDOMParseException("出错了",new Exception());
-
             List<Element> contents = root.getChildren("Contents");
-            contents.forEach(item -> {
+            for (Element item : contents) {
                 HOSObjectSummary HOSObjectSummary = new HOSObjectSummary();
                 String key = getElementValue(item, "Key");
                 String lastModified = getElementValue(item, "LastModified");
@@ -622,14 +619,13 @@ public final class ResponseParsers {
                 try {
                     HOSObjectSummary.setLastModified(DateUtil.parseIso8601Date(lastModified));
                 } catch (ParseException e) {
-                    log.error("解析时间戳出错", e.getMessage());
+                    throw new ResponseParseException(e.getMessage(), e);
                 }
                 HOSObjectSummary.setETag(eTag.substring(1, eTag.length() - 1));
                 HOSObjectSummary.setSize(isNullOrEmpty(size) ? null : Long.valueOf(size));
                 HOSObjectSummary.setStorageClass(storageClass);
                 result.getObjectSummaries().add(HOSObjectSummary);
-            });
-
+            }
             return result;
         } catch (JDOMParseException e) {
             e.printStackTrace();
@@ -992,7 +988,7 @@ public final class ResponseParsers {
                 }
 
                 MultipartUpload mu = new MultipartUpload();
-                mu.setKey(elem.getChildText("Key"));
+                mu.setKey(decodeIfSpecified(elem.getChildText("Key"), true));
                 mu.setUploadId(elem.getChildText("UploadId"));
                 mu.setStorageClass(elem.getChildText("StorageClass"));
                 mu.setInitiated(DateUtil.parseIso8601Date(elem.getChildText("Initiated")));

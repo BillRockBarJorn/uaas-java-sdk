@@ -35,7 +35,6 @@ import static com.heredata.utils.ResourceUtils.safeCloseResponse;
 import static com.heredata.utils.StringUtils.isNullOrEmpty;
 import static com.heredata.utils.StringUtils.trimQuotes;
 
-@Slf4j
 public final class ResponseParsers {
     public static final ListBucketResponseParser listBucketResponseParser = new ListBucketResponseParser();
     public static final GetBucketInfoResponseParser getBucketInfoResponseParser = new GetBucketInfoResponseParser();

@@ -20,6 +20,7 @@ import com.heredata.hos.utils.HOSUtils;
 import com.heredata.model.VoidResult;
 import com.heredata.model.WebServiceRequest;
 import com.heredata.utils.IOUtils;
+import com.heredata.utils.LogUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -314,6 +315,12 @@ public class HOSMultipartOperation extends HOSOperation {
         params.put(PART_NUMBER, Integer.toString(partNumber));
         params.put(UPLOAD_ID, uploadId);
 
+        try {
+            LogUtils.getLog().debug("uploadPart  this part size::" + uploadPartRequest.getInputStream().available());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         HOSRequestMessage request = new HOSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(uploadPartRequest))
                 .setMethod(HttpMethod.PUT).setBucket(bucketName).setKey(key).setParameters(params).setHeaders(headers)
                 .setInputStream(repeatableInputStream).setInputSize(uploadPartRequest.getPartSize()).setAccount(credsProvider.getCredentials().getAccount())
@@ -409,7 +416,7 @@ public class HOSMultipartOperation extends HOSOperation {
             if (!checkParamRange(partSize, 0, true, DEFAULT_FILE_SIZE_LIMIT, true)) {
                 throw new IllegalArgumentException(HOS_RESOURCE_MANAGER.getString("FileSizeOutOfRange"));
             }
-
+            LogUtils.getLog().debug("populateUploadPartOptionalHeaders   size::" + partSize);
             headers.put(HOSHeaders.CONTENT_LENGTH, Long.toString(partSize));
         }
 

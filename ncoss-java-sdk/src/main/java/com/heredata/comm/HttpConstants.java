@@ -43,5 +43,5 @@ public final class HttpConstants extends Constants {
     /**
      * 日志包的名称
      */
-    public static final String LOGGER_PACKAGE_NAME = "com.heredata";
+    public static final String LOGGER_PACKAGE_NAME = "com.heredata.sdk";
 }

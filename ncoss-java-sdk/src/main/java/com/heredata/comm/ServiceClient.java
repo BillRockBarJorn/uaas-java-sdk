@@ -113,9 +113,9 @@ public abstract class ServiceClient {
                 // Step 3. Send HTTP request to HOS.
                 String poolStatsInfo = config.isLogConnectionPoolStatsEnable() ? "Connection pool stats " + getConnectionPoolStats() : "";
                 long startTime = System.currentTimeMillis();
-                LogUtils.getLog().info("requestURL：：" + httpRequest.uri + "  method:" + httpRequest.method + "  headers:" + httpRequest.getHeaders());
+                LogUtils.getLog().debug("requestURL：：" + httpRequest.uri + "  method:" + httpRequest.method + "  headers:" + httpRequest.getHeaders() + httpRequest.getContent());
                 response = sendRequestCore(httpRequest, context);
-                LogUtils.getLog().info("response code::" + response.getStatusCode());
+                LogUtils.getLog().debug("response code::" + response.getStatusCode() + "requestUrl:" + httpRequest.uri);
                 long duration = System.currentTimeMillis() - startTime;
                 if (duration > config.getSlowRequestsThreshold()) {
                     LogUtils.getLog().warn(formatSlowRequestLog(request, response, duration) + poolStatsInfo);

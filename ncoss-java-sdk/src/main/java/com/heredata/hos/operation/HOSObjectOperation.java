@@ -612,8 +612,8 @@ public class HOSObjectOperation extends HOSOperation {
             this.getSimplifiedObjectMeta(genericRequest);
             return true;
         } catch (ServiceException e) {
-            if (e.getErrorCode().equals(HOSErrorCode.NO_SUCH_BUCKET)
-                    || e.getErrorCode().equals(HOSErrorCode.NO_SUCH_KEY)) {
+            if (e.getErrorMessage().equals(HOSErrorCode.NO_SUCH_BUCKET)
+                    || e.getErrorMessage().equals(HOSErrorCode.NO_SUCH_KEY)) {
                 return false;
             }
             throw e;

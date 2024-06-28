@@ -92,11 +92,11 @@ public class UploadObjectRequest extends GenericRequest {
     }
 
     public void setPartSize(long partSize) {
-        if (partSize < 1024 * 100) {
-            this.partSize = 1024 * 100;
-        } else {
+//        if (partSize < 1024 * 100) {
+//            this.partSize = 1024 * 100;
+//        } else {
             this.partSize = partSize;
-        }
+//        }
     }
 
     public void setTaskNum(int taskNum) {

@@ -89,9 +89,14 @@ public class LifecycleRule {
          */
         private Boolean expiredObjectDeleteMarker;
 
+        @Deprecated
         public Expiration(Integer days, Boolean expiredObjectDeleteMarker) {
             this.days = days;
             this.expiredObjectDeleteMarker = expiredObjectDeleteMarker;
+        }
+
+        public Expiration(Integer days) {
+            this.days = days;
         }
 
         public Expiration() {

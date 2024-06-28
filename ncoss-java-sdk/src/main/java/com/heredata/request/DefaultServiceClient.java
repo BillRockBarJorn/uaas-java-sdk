@@ -40,7 +40,6 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.*;
 import java.io.ByteArrayInputStream;

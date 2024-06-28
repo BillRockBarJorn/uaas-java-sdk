@@ -891,7 +891,7 @@ public class ObjectTest extends TestBase {
         HOS hos = getHOSClient();
         try {
             // 分片上传、完成上传的基础信息
-            String bucketName = "ncoss-4";
+            String bucketName = "ncoss-3";
             String key = "aa.avi";
 
             // 构建初始化上传请求参数对象
@@ -1065,7 +1065,8 @@ public class ObjectTest extends TestBase {
         // 创建HOSClient实例。
         HOS hos = getHOSClient();
 
-        File file = new File("E:\\devData\\home-space\\myStudy\\bigcomponent\\hadoop\\hadoop-branch-3.3.1\\BP-345915182-172.26.68.47-1692606038655\\current\\rbw\\blk_1073741825");
+//        File file = new File("E:\\devData\\home-space\\myStudy\\bigcomponent\\hadoop\\hadoop-branch-3.3.1\\BP-345915182-172.26.68.47-1692606038655\\current\\rbw\\blk_1073741825");
+        File file = new File("E:\\比洛巴乔\\Downloads\\10.86.16.11_3336_membership20240627_03_02.sql");
 
         try {
             ObjectMetadata meta = new ObjectMetadata();
@@ -1077,15 +1078,17 @@ public class ObjectTest extends TestBase {
 
             // 通过UploadFileRequest设置多个参数。
             // 依次填写Bucket名称（例如examplebucket）以及Object完整路径（例如exampledir/exampleobject.txt），Object完整路径中不能包含Bucket名称。
-            UploadObjectRequest uploadObjectRequest = new UploadObjectRequest("bucket", "BP-1786105931-172.26.68.47-1692603292363/current/finalized/subdir0/subdir0/blk_1073741825");
+//            UploadObjectRequest uploadObjectRequest = new UploadObjectRequest("bucket", "BP-1786105931-172.26.68.47-1692603292363/current/finalized/subdir0/subdir0/blk_1073741825");
+            UploadObjectRequest uploadObjectRequest = new UploadObjectRequest("bucket", "10.86.16.11_3336_membership20240627_03_02.sql");
 
             // 通过UploadFileRequest设置单个参数。
             // 填写本地文件的完整路径，例如D:\\localpath\\examplefile.txt。如果未指定本地路径，则默认从示例程序所属项目对应本地路径中上传文件。
             uploadObjectRequest.setUploadFile(file.getAbsolutePath());
             // 指定上传并发线程数，默认值为1。
-            uploadObjectRequest.setTaskNum(5);
+            uploadObjectRequest.setTaskNum(10);
             // 指定上传的分片大小，单位为字节，取值范围为100 KB~5 GB。默认值为100 KB。
-            uploadObjectRequest.setPartSize(10 * 1024 * 1024);
+//            uploadObjectRequest.setPartSize(10 * 1024 * 1024);
+            uploadObjectRequest.setPartSize(215247854);
             // 开启断点续传，默认关闭。
             uploadObjectRequest.setEnableCheckpoint(true);
             // 记录本地分片上传结果的文件。上传过程中的进度信息会保存在该文件中，如果某一分片上传失败，再次上传时会根据文件中记录的点继续上传。上传完成后，该文件会被删除。
