@@ -60,7 +60,7 @@ public class HOSDownloadOperation {
     /**
      * 修复漏洞3.1.1.2    漏洞来源代码扫描报告-cmstoreos-sdk-java-1215-0b57751a.pdf
      */
-    static class DownloadCheckPoint extends ObjectInputStream implements Serializable{
+    static class DownloadCheckPoint extends ObjectInputStream implements Serializable {
 
         private static final long serialVersionUID = 4682293344365787077L;
 
@@ -387,7 +387,7 @@ public class HOSDownloadOperation {
                 String versionId = downloadFileRequest.getVersionId();
                 if (versionId != null) {
                     downloadFileRequest.setCheckpointFile(downloadFileRequest.getDownloadFile() + "."
-                            + BinaryUtil.calculateSha256(versionId.getBytes()) + ".dcp");
+                            + BinaryUtil.bytesToHex(BinaryUtil.calculateSha256(versionId.getBytes())) + ".dcp");
                 } else {
                     downloadFileRequest.setCheckpointFile(downloadFileRequest.getDownloadFile() + ".dcp");
                 }
