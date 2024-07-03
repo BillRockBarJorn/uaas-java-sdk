@@ -1,6 +1,10 @@
 package com.heredata.eics.service;
 
+import com.alibaba.fastjson.JSON;
+import com.heredata.eics.entity.MailDTO;
+import com.heredata.eics.entity.MailEntity;
 import com.heredata.eics.task.ScheduledUpload;
+import com.heredata.eics.utils.EicsUtils;
 import com.heredata.exception.ServiceException;
 import com.heredata.hos.HOS;
 import com.heredata.hos.model.*;
@@ -9,8 +13,14 @@ import com.heredata.hos.model.bucket.BucketList;
 import com.heredata.hos.model.bucket.BucketVersioningConfiguration;
 import com.heredata.model.VoidResult;
 import com.heredata.swift.model.DownloadFileRequest;
+import com.heredata.utils.StringUtils;
 import com.sitech.cmap.fw.core.wsg.WsgPageResult;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.HttpClients;
 import org.springframework.beans.factory.annotation.Value;
 
 import javax.annotation.Resource;
@@ -18,10 +28,21 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.rmi.RemoteException;
+import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import static com.heredata.eics.utils.EicsUtils.converseFileSize;
 
 /**
  * 业务层
@@ -54,19 +75,6 @@ public class Service {
     private String scannerPath;
 
     /**
-     * 是否删除历史数据
-     * true：上传完成后，会将以前（15天）日期中的改文件删除掉
-     */
-    @Value("${isDeleteHistory}")
-    private boolean isDeleteHistory;
-
-    @Value("${accessKey}")
-    private String accessKey;
-
-    @Value("${secretKey}")
-    private String secretKey;
-
-    /**
      * 获取对象列表
      * 按照目前的推理来看  一天150~200个文件，
      * 如果需要保存15天，那么2250~3000个文件，
@@ -76,8 +84,7 @@ public class Service {
      * @param date
      * @return
      */
-    public WsgPageResult<List<HOSVersionSummary>> objectList(String bucketName, String fileName, String date, int pageSize, int curPage
-    ) {
+    public WsgPageResult<List<HOSVersionSummary>> objectList(String bucketName, String fileName, String date, int pageSize, int curPage) {
 
         List<HOSVersionSummary> list = new ArrayList<>();
         int total = 0;
@@ -110,15 +117,32 @@ public class Service {
      */
     public Boolean downLoadObject(String bucketName, String fileName, String filePath) {
         long start = System.currentTimeMillis();
-        GetObjectRequest getObjectRequest = new GetObjectRequest(bucketName, fileName);
+        int i = fileName.lastIndexOf("_");
+        String date = "";
+        if (fileName.contains(".xbstream.gz")) {
+            date = fileName.substring(i + 1, i + 9);
+        } else {
+            date = fileName.substring(i - 8, i);
+        }
+        bucketName = bucketPrefix + date;
         try {
-            HOSObject object = hos.getObject(getObjectRequest);
-            DownloadFileRequest downloadFileRequest = new DownloadFileRequest(bucketName, fileName);
+            VersionListing versionListing = hos.listVersions(bucketName, fileName);
+            if (versionListing == null || versionListing.getVersionSummaries() == null || versionListing.getVersionSummaries().isEmpty()) {
+                throw new RuntimeException("bucketName:" + bucketName + " fileName:" + fileName + "not find");
+            }
+            HOSVersionSummary hosVersionSummary = null;
+            for (HOSVersionSummary versionSummary : versionListing.getVersionSummaries()) {
+                if (versionSummary.isLatest()) {
+                    hosVersionSummary = versionSummary;
+                    break;
+                }
+            }
+            DownloadFileRequest downloadFileRequest = new DownloadFileRequest(hosVersionSummary.getBucketName(), hosVersionSummary.getKey());
+            downloadFileRequest.setVersionId(hosVersionSummary.getVersionId());
             // 下载本地的文件
             downloadFileRequest.setDownloadFile(filePath);
-            if (object.getSize() > fileLimt * 1024 * 1024) {
+            if (hosVersionSummary.getSize() > fileLimt * 1024 * 1024) {
                 // 走断点下载
-                // 开启断点下载
                 downloadFileRequest.setEnableCheckpoint(true);
                 // 每片5M的进行下载
                 downloadFileRequest.setPartSize(1024 * 1024 * partSize);
@@ -129,8 +153,8 @@ public class Service {
                 // 走普通下载
                 hos.downloadObject(downloadFileRequest);
             }
-            log.info("bucket:{},object:{},fileSize:{},耗时:{} ms", bucketName, object
-                    , converseFileSize(object.getSize()), System.currentTimeMillis() - start);
+            log.info("bucket:{},object:{},fileSize:{},耗时:{} ms", bucketName, hosVersionSummary.getKey()
+                    , converseFileSize(hosVersionSummary.getSize()), System.currentTimeMillis() - start);
         } catch (Exception e) {
             log.error("bucket:{},object:{},error:{}", bucketName, fileName, e.getMessage());
         } catch (Throwable throwable) {
@@ -139,15 +163,6 @@ public class Service {
         return true;
     }
 
-    private String converseFileSize(Long size) {
-        String[] arr = new String[]{"B", "KB", "MB", "GB", "TB"};
-        int index = 0;
-        while (size > 1024) {
-            size /= 1024;
-            index++;
-        }
-        return size + arr[index];
-    }
 
     /**
      * 删除桶
@@ -188,6 +203,10 @@ public class Service {
         return true;
     }
 
+    DecimalFormat df = new DecimalFormat("#.00");
+
+    @Resource
+    EicsUtils eicsUtils;
 
     /**
      * 上传指定日期到对象存储中
@@ -195,17 +214,40 @@ public class Service {
      * @return
      */
     public Boolean upload(String date) {
-
-        long start0 = System.currentTimeMillis();
+        startTime = System.currentTimeMillis();
+        /**
+         *组装今天的日期形式   如果有日期，采用参数的，如果没有组装今天的
+         */
+        // 获取目前的日期
         String dateStr = date;
 
-        // 先查询桶是否存在
-        if (!hos.doesBucketExist(bucketPrefix + dateStr)) {
-            try {
-                hos.createBucket(bucketPrefix + dateStr);
-            } catch (Exception e) {
-                log.error("桶创建失败:{}", bucketPrefix + dateStr);
-                throw new RuntimeException("桶创建失败");
+        for (int i = 0; i < 3; i++) {
+            // 先查询桶是否存在
+            if (!hos.doesBucketExist(bucketPrefix + dateStr)) {
+                try {
+                    hos.createBucket(bucketPrefix + dateStr);
+                    // 设置桶的生命周期
+                    SetBucketLifecycleRequest setBucketLifecycleRequest = new SetBucketLifecycleRequest();
+                    LifecycleRule lifecycleRule = new LifecycleRule();
+                    lifecycleRule.setStatus(LifecycleRule.RuleStatus.Enabled);
+                    LifecycleRule.Filter filter = new LifecycleRule.Filter();
+                    filter.setPrefix("%");
+                    lifecycleRule.setFilter(filter);
+                    LifecycleRule.Expiration expiration = new LifecycleRule.Expiration(expirationDays);
+                    lifecycleRule.setExpiration(expiration);
+                    setBucketLifecycleRequest.getLifecycleRules().add(lifecycleRule);
+                    setBucketLifecycleRequest.setBucketName(bucketPrefix + dateStr);
+                    hos.setBucketLifecycle(setBucketLifecycleRequest);
+                    break;
+                } catch (Exception e) {
+                    log.error("桶创建失败:{}", bucketPrefix + dateStr);
+                    try {
+                        TimeUnit.SECONDS.sleep(10);
+                    } catch (InterruptedException interruptedException) {
+                        interruptedException.printStackTrace();
+                    }
+                    continue;
+                }
             }
         }
 
@@ -215,120 +257,50 @@ public class Service {
         log.info("执行上传任务,扫描路径为：" + scannerPath);
         File file = new File(scannerPath);
         File[] files = file.listFiles();
+        // 过滤出名字只含有dateStr的文件
+        // 将本天的数据查询出来
+        List<File> collect1 = Arrays.stream(files).filter(item -> {
+            long l = item.lastModified();
+            String format = EicsUtils.format_yyyyMMdd.format(new Date(l));
+            log.info("format:{},dateStr:{},fileName:{}", format, dateStr, item.getName());
+            if (dateStr.equals(format) && item.getName().contains(dateStr)) {
+                return true;
+            } else {
+                return false;
+            }
+        }).collect(Collectors.toList());
+        // 每上传一个文件就将上传的大小加到该变量中
         long totalSize = 0;
-        for (File file1 : files) {
+        // 邮件实体内容
+        List<MailEntity> ans = new ArrayList<>();
+        // 遍历需要上传的文件集合
+        for (File file1 : collect1) {
             log.info("扫描到文件：" + file1.toString());
             log.info("开始上传=====================================================================================================================");
             long start = System.currentTimeMillis();
-            if (file1.getName().contains(dateStr)) {
+            MailEntity mailEntity = new MailEntity();
+            mailEntity.setBucketName(bucketPrefix + dateStr);
+            mailEntity.setFileName(file1.getName());
+            mailEntity.setSize(file1.length());
+            try {
+                // 代表当天首次上传
+                eicsUtils.uploadFile(bucketPrefix + dateStr, file1, mailEntity);
                 totalSize += file1.length();
-                try {
-                    // 执行上传任务
-                    if (hos.doesObjectExist(bucketPrefix + dateStr, file1.getName())) {
-                        // 说明当前文件今天已经更新过了，已经存在了，开启桶的版本管理
-                        log.info("当前文件已经存在,bucket：{}，key:{}", bucketPrefix + dateStr, file1.getName());
-                        log.info("开启bucket：{}生命周期为ENABLED", bucketPrefix + dateStr);
-                        BucketVersioningConfiguration bucketVersioningConfiguration =
-                                new BucketVersioningConfiguration(BucketVersioningConfiguration.ENABLED);
-                        SetBucketVersioningRequest setBucketVersioningRequest = new SetBucketVersioningRequest(
-                                bucketPrefix + dateStr, bucketVersioningConfiguration);
-                        VoidResult result = hos.setBucketVersioning(setBucketVersioningRequest);
-                        if (result.getResponse().isSuccessful()) {
-                            log.info("开启bucket:{}生命周期为ENABLED成功", bucketPrefix + dateStr);
-                            // 组装对象，上传到对象存储中
-                            uploadFile(bucketPrefix + dateStr, file1);
-                            // 删除当前旧版本对象
-                            ListVersionsRequest listVersionsRequest = new ListVersionsRequest()
-                                    .withBucketName(bucketPrefix + dateStr)
-                                    .withPrefix(file1.getName());
-                            VersionListing versionListing = hos.listVersions(listVersionsRequest);
-                            log.info("查询到file:{}含有的版本对象列表为：{}", file1.getName(), versionListing.getVersionSummaries().toArray());
-                            //删除历史版本号的文件
-                            List<HOSVersionSummary> collect = versionListing.getVersionSummaries()
-                                    .stream()
-                                    .filter(item -> !item.isLatest())
-                                    .collect(Collectors.toList());
-                            DeleteObjectsRequest deleteObjectsRequest = new DeleteObjectsRequest(bucketPrefix + dateStr);
-                            deleteObjectsRequest.setKey(file1.getName());
-                            for (HOSVersionSummary hosVersionSummary : collect) {
-                                deleteObjectsRequest.setVersionId(hosVersionSummary.getVersionId());
-                                VoidResult result1 = hos.deleteObject(deleteObjectsRequest);
-                                if (result1.getResponse().isSuccessful()) {
-                                    log.info("删除旧版本对象成功，bucketName:{},fileName:{},versionId:{}"
-                                            , bucketPrefix + dateStr, file1.getName(), hosVersionSummary.getVersionId());
-                                } else {
-                                    log.error("删除旧版本对象失败，bucketName:{},fileName:{},versionId:{},err:{}"
-                                            , bucketPrefix + dateStr, file1.getName(), hosVersionSummary.getVersionId(), result1.getResponse().getErrorResponseAsString());
-                                }
-                            }
-                        } else {
-                            throw new RuntimeException("开启版本管理失败：" + result.getResponse().getErrorResponseAsString());
-                        }
-                    } else {
-                        // 代表当天首次上传
-                        uploadFile(bucketPrefix + dateStr, file1);
-                    }
-                } catch (Exception e) {
-                    log.error("上传文件发生异常，错误信息：" + e.getMessage());
-                }
+            } catch (Exception e) {
+                log.error("上传文件发生异常，错误信息：" + e.getMessage());
+            } finally {
+                ans.add(mailEntity);
             }
             log.info("该文件file:{}备份耗时：{} ms", file1.getName(), System.currentTimeMillis() - start);
         }
-        log.info("本次备份总耗时：{},文件总大小为：{} GB", (System.currentTimeMillis() - start0), totalSize / 1024 / 1024 / 1024);
+        double number = ((double) totalSize / (double) (1024 * 1024 * 1024));
+        log.info("本次备份总耗时：{},文件总大小为：{} GB", (System.currentTimeMillis() - startTime), df.format(number));
+        // 开始组装邮件内容
+        eicsUtils.generateMailContentAndSend(ans);
         return true;
     }
 
-
-    /**
-     * 上传该路径下的文件
-     * @param file
-     */
-    private void uploadFile(String bucket, File file) throws IOException {
-
-        if (!file.exists() && !file.isFile()) {
-            throw new FileNotFoundException(file.getAbsolutePath() + " not found.");
-        }
-
-        if (file.length() > fileLimt * 1024 * 1024) {
-            // 断点续传
-            log.info("断点续传：文件:{},大小：{},bucket:{}", file.getName(), file.length(), bucket);
-
-            UploadObjectRequest uploadObjectRequest = new UploadObjectRequest(bucket, file.getName());
-            // 通过UploadFileRequest设置单个参数。
-            uploadObjectRequest.setUploadFile(file.getAbsolutePath());
-            // 指定上传并发线程数，默认值为1。
-            uploadObjectRequest.setTaskNum(threadNum);
-            // 指定上传的分片大小，单位为字节，取值范围为100 KB~5 GB。默认值为100 KB。
-            uploadObjectRequest.setPartSize(partSize * 1024 * 1024);
-            // 开启断点续传，默认关闭。
-            uploadObjectRequest.setEnableCheckpoint(true);
-            // 断点续传上传。
-            try {
-                CompleteMultipartUploadResult uploadFileResult = hos.uploadFile(uploadObjectRequest);
-                if (uploadFileResult.getResponse().isSuccessful()) {
-                    log.info("断点续传成功：文件:{},大小：{},bucket:{}", file.getName(), file.length(), bucket);
-                } else {
-                    log.info("断点续传失败：文件:{},大小：{},bucket:{}，errorStr:{}", file.getName(), file.length(), bucket
-                            , uploadFileResult.getResponse().getErrorResponseAsString());
-                }
-            } catch (Throwable throwable) {
-                log.error("断点续传出现异常：文件:{},大小：{},bucket:{}，errorStr:{}", file.getName(), file.length(), bucket
-                        , throwable.getMessage());
-                throwable.printStackTrace();
-                throw new RemoteException(throwable.getMessage());
-            }
-        } else {
-            // 直接上传
-            log.info("直接上传：文件:{},大小：{},bucket:{}", file.getName(), file.length(), bucket);
-            PutObjectResult putObjectResult = hos.putObject(bucket, file.getName(), file);
-            if (putObjectResult.getResponse().isSuccessful()) {
-                log.info("直接上传成功,bucket:{},key:{},versionId:{}", bucket, file.getName(), putObjectResult.getVersionId());
-            } else {
-                log.error("直接上传成功,bucket:{},key:{},errorStr:{}", bucket, file.getName(), putObjectResult.getResponse().getErrorResponseAsString());
-                throw new RemoteException(putObjectResult.getResponse().getErrorResponseAsString());
-            }
-        }
-    }
+    long startTime = System.currentTimeMillis();
 
     public Bucket getBucketInfo(String bucketName) {
         Bucket bucketInfo = hos.getBucketInfo(bucketName);
@@ -355,7 +327,6 @@ public class Service {
         lifecycleRule.setExpiration(expiration);
         setBucketLifecycleRequest.getLifecycleRules().add(lifecycleRule);
         hos.setBucketLifecycle(setBucketLifecycleRequest);
-
         return true;
     }
 
@@ -374,6 +345,73 @@ public class Service {
         // 开启断点续传，默认关闭。
         uploadObjectRequest.setEnableCheckpoint(true);
         hos.uploadFile(uploadObjectRequest);
+        return false;
+    }
+
+    public List<HOSVersionSummary> objectList(String fileName, String startTime, String endTime, String orderCondition) {
+        // 将所有数据查询出来
+        BucketList bucketList = hos.listBuckets(new ListBucketsRequest().withPrefix(bucketPrefix));
+        List<HOSVersionSummary> ans = new ArrayList<>();
+        for (Bucket bucket : bucketList.getBuckets()) {
+            VersionListing versionListing = hos.listVersions(bucket.getBucketName(), null);
+            ans.addAll(versionListing.getVersionSummaries());
+        }
+
+        // 进行筛选过滤
+        // 名称过滤
+        if (!StringUtils.isNullOrEmpty(fileName)) {
+            ans = ans.stream().filter(item -> item.getKey().contains(fileName)).collect(Collectors.toList());
+        }
+
+        // startTime时间过滤
+        if (!StringUtils.isNullOrEmpty(startTime)) {
+            try {
+                Date parse = EicsUtils.format_yyyyMMdd.parse(startTime);
+                ans = ans.stream().filter(item -> item.getLastModified().getTime() >= parse.getTime()).collect(Collectors.toList());
+            } catch (ParseException e) {
+                throw new RuntimeException("startTime格式错误，请遵循\"20240501\"");
+            }
+        }
+
+        // endTime时间过滤
+        if (!StringUtils.isNullOrEmpty(endTime)) {
+            try {
+                Date parse = EicsUtils.format_yyyyMMdd.parse(endTime);
+                ans = ans.stream().filter(item -> item.getLastModified().getTime() <= parse.getTime()).collect(Collectors.toList());
+            } catch (ParseException e) {
+                throw new RuntimeException("startTime格式错误，请遵循\"20240501\"");
+            }
+        }
+//        // 因为有一些文件是含有旧版本文件，此时再过滤一层取到最新文件
+//        ans = ans.stream().filter(item -> item.isLatest()).collect(Collectors.toList());
+        return ans;
+    }
+
+    public boolean deleteObject(String bucketName, String key, String versionID) {
+        DeleteObjectsRequest deleteObjectsRequest = new DeleteObjectsRequest(bucketName);
+        deleteObjectsRequest.setKey(key);
+        deleteObjectsRequest.setVersionId(versionID);
+        hos.deleteObject(deleteObjectsRequest);
+        return false;
+    }
+
+    /**
+     * 就出旧版本的对象
+     * @param bucketName
+     * @return
+     */
+    public boolean deleteOldVersion(String bucketName) {
+        VersionListing versionListing = hos.listVersions(bucketName, null);
+        for (HOSVersionSummary versionSummary : versionListing.getVersionSummaries()) {
+            log.info("bucketName:{}  key:{}  fileSize:{}  isLast:{}"
+                    , versionSummary.getBucketName(), versionSummary.getKey(), versionSummary.getSize(), versionSummary.isLatest());
+            if (versionSummary.getSize() == 0 && versionSummary.isLatest()) {
+                DeleteObjectsRequest deleteObjectsRequest = new DeleteObjectsRequest(versionSummary.getBucketName());
+                deleteObjectsRequest.setKey(versionSummary.getKey());
+                deleteObjectsRequest.setVersionId(versionSummary.getVersionId());
+                hos.deleteObject(deleteObjectsRequest);
+            }
+        }
         return false;
     }
 }

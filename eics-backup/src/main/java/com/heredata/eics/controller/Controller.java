@@ -28,13 +28,38 @@ public class Controller {
     }
 
     @GetMapping("/listObject")
-    public WsgPageResult<List<HOSVersionSummary>> objectList(@RequestParam(required = false) String bucketName
-            , @RequestParam(required = false) String fileName
-            , @RequestParam(required = false) String date
-            , @RequestParam(required = false, defaultValue = "-1") int limit
-            , @RequestParam(required = false, defaultValue = "-1") int page) {
-        WsgPageResult<List<HOSVersionSummary>> listWsgPageResult = service.objectList(bucketName, fileName, date, limit, page);
-        return listWsgPageResult;
+    public String objectList(@RequestParam(required = false) String fileName
+            , @RequestParam(required = false) String startTime
+            , @RequestParam(required = false) String endTime
+            , @RequestParam(required = false) String orderCondition) {
+        List<HOSVersionSummary> listWsgPageResult = service.objectList(fileName, startTime, endTime, orderCondition);
+
+        // 数据查询出来了，进行格式化输出处理，找到key名字最长长度和size最长长度
+        int keyNameMaxLength = 0, sizeMaxLength = 0;
+        for (HOSVersionSummary hosVersionSummary : listWsgPageResult) {
+            keyNameMaxLength = Math.max(keyNameMaxLength, hosVersionSummary.getKey().length());
+            sizeMaxLength = Math.max(sizeMaxLength, (hosVersionSummary.getSize() + "").length());
+        }
+
+        StringBuffer stringBuffer = new StringBuffer();
+        for (HOSVersionSummary datum : listWsgPageResult) {
+            stringBuffer.append("bucketName:").append(datum.getBucketName())
+                    .append("    fileName:").append(datum.getKey());
+
+            // 补齐keyName长度
+            for (int i = 0; i < (keyNameMaxLength - datum.getKey().length()); i++) {
+                stringBuffer.append(" ");
+            }
+            stringBuffer.append("    size:").append(datum.getSize());
+
+            stringBuffer.append("\r\n");
+        }
+        return stringBuffer.toString();
+    }
+
+    @GetMapping("/deleteObject")
+    public boolean deleteObject(String bucketName, String key, String versionId) {
+        return service.deleteObject(bucketName, key, versionId);
     }
 
 
@@ -83,5 +108,11 @@ public class Controller {
     @GetMapping("/upoadSingleObject")
     public boolean upoadSingleObject(String fileName) throws Throwable {
         return service.upoadSingleObject(fileName);
+    }
+
+    @GetMapping("/deleteOldVersion")
+    public boolean deleteOldVersion(String bucketName) throws Throwable {
+        System.out.println("deleteOldVersion  start  bucketName:" + bucketName);
+        return service.deleteOldVersion(bucketName);
     }
 }
