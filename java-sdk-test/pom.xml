@@ -8,6 +8,7 @@
     <artifactId>java-sdk-test</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <description>该模块主要测试ncoss-sdk使用的,用命令行来使用</description>
 
     <dependencies>
         <dependency>
