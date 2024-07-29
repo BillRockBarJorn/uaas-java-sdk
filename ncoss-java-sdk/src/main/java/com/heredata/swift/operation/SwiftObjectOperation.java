@@ -127,7 +127,7 @@ public class SwiftObjectOperation extends SwiftOperation {
 
         assertParameterNotNull(bucketName, "bucketName");
         assertParameterNotNull(key, "key");
-        ensureBucketNameValid(bucketName);
+        ensureBucketNameCreationValid(bucketName);
         ensureObjectKeyValid(key);
 
         Map<String, String> headers = new HashMap<String, String>();
@@ -203,7 +203,7 @@ public class SwiftObjectOperation extends SwiftOperation {
 
         assertParameterNotNull(bucketName, "bucketName");
         assertParameterNotNull(key, "key");
-        ensureBucketNameValid(bucketName);
+        ensureBucketNameCreationValid(bucketName);
         ensureObjectKeyValid(key);
 
         Map<String, String> params = new HashMap<String, String>();
@@ -237,7 +237,7 @@ public class SwiftObjectOperation extends SwiftOperation {
 
         assertParameterNotNull(bucketName, "bucketName");
         assertParameterNotNull(key, "key");
-        ensureBucketNameValid(bucketName);
+        ensureBucketNameCreationValid(bucketName);
         ensureObjectKeyValid(key);
 
         Map<String, String> params = new HashMap<String, String>();
@@ -284,7 +284,7 @@ public class SwiftObjectOperation extends SwiftOperation {
         String key = genericRequest.getKey();
 
         assertParameterNotNull(bucketName, "bucketName");
-        ensureBucketNameValid(bucketName);
+        ensureBucketNameCreationValid(bucketName);
         assertParameterNotNull(key, "key");
         ensureObjectKeyValid(key);
 
@@ -308,7 +308,7 @@ public class SwiftObjectOperation extends SwiftOperation {
 
         String bucketName = deleteObjectsRequest.getBucketName();
         assertParameterNotNull(bucketName, "bucketName");
-        ensureBucketNameValid(bucketName);
+        ensureBucketNameCreationValid(bucketName);
         DeleteObjectsResult deleteObjectsResult = new DeleteObjectsResult();
         List<String> deletedObjects = new ArrayList<String>();
         if (!deleteObjectsRequest.getKeys().isEmpty()) {
@@ -340,7 +340,7 @@ public class SwiftObjectOperation extends SwiftOperation {
 
     public VoidResult setObjectMeta(String bucketName, String key, ObjectMetadata objectMetadata) {
         assertParameterNotNull(bucketName, "bucketName");
-        ensureBucketNameValid(bucketName);
+        ensureBucketNameCreationValid(bucketName);
         assertParameterNotNull(key, "key");
         ensureObjectKeyValid(key);
 
@@ -411,7 +411,7 @@ public class SwiftObjectOperation extends SwiftOperation {
          */
         assertParameterNotNull(bucketName, "bucketName");
         assertParameterNotNull(key, "key");
-        ensureBucketNameValid(bucketName);
+        ensureBucketNameCreationValid(bucketName);
         ensureObjectKeyValid(key);
 
         String contentType = null;

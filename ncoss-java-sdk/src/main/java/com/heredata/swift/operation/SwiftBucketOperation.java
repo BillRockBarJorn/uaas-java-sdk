@@ -20,7 +20,6 @@ import java.util.Map;
 import static com.heredata.hos.comm.HOSRequestParameters.*;
 import static com.heredata.swift.parser.ResponseParsers.*;
 import static com.heredata.swift.utils.SwiftUtils.ensureBucketNameCreationValid;
-import static com.heredata.swift.utils.SwiftUtils.ensureBucketNameValid;
 import static com.heredata.utils.CodingUtils.assertParameterNotNull;
 
 
@@ -114,7 +113,7 @@ public class SwiftBucketOperation extends SwiftOperation {
 
         String bucketName = genericRequest.getBucketName();
         assertParameterNotNull(bucketName, "bucketName");
-        ensureBucketNameValid(bucketName);
+        ensureBucketNameCreationValid(bucketName);
 
         SWIFTRequestMessage request = new RequestMessageBuilder(getInnerClient())
                 .setEndpoint(getEndpoint(genericRequest))
@@ -207,7 +206,7 @@ public class SwiftBucketOperation extends SwiftOperation {
 
         String bucketName = bucketAclRequest.getBucketName();
         assertParameterNotNull(bucketName, "bucketName");
-        ensureBucketNameValid(bucketName);
+        ensureBucketNameCreationValid(bucketName);
 
         // 处理头元素
         Map<String, String> head = new HashMap<>();
@@ -268,7 +267,7 @@ public class SwiftBucketOperation extends SwiftOperation {
 
         String bucketName = listObjectsRequest.getBucketName();
         assertParameterNotNull(bucketName, "bucketName");
-        ensureBucketNameValid(bucketName);
+        ensureBucketNameCreationValid(bucketName);
 
         Map<String, String> params = new LinkedHashMap<String, String>();
         populateListObjectsRequestParameters(listObjectsRequest, params);
@@ -297,7 +296,7 @@ public class SwiftBucketOperation extends SwiftOperation {
 
         String bucketName = genericRequest.getBucketName();
         assertParameterNotNull(bucketName, "bucketName");
-        ensureBucketNameValid(bucketName);
+        ensureBucketNameCreationValid(bucketName);
 
         Map<String, String> params = new HashMap<String, String>();
 
@@ -333,7 +332,7 @@ public class SwiftBucketOperation extends SwiftOperation {
 
     public BucketQuotaResult getBucketQuota(String bucket) {
         assertParameterNotNull(bucket, "bucketName");
-        ensureBucketNameValid(bucket);
+        ensureBucketNameCreationValid(bucket);
 
         Map<String, String> map = new HashMap<>();
         map.put(QUOTA, null);
@@ -351,7 +350,7 @@ public class SwiftBucketOperation extends SwiftOperation {
 
         String bucketName = quotaBucket.getBucketName();
         assertParameterNotNull(bucketName, "bucketName");
-        ensureBucketNameValid(bucketName);
+        ensureBucketNameCreationValid(bucketName);
 
         // 添加桶配额在请求头中
         Map<String, String> headers = new HashMap<>();
