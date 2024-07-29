@@ -103,6 +103,7 @@ public class ScheduledUpload {
                     hos.setBucketLifecycle(setBucketLifecycleRequest);
                     break;
                 } catch (Exception e) {
+                    // 说明有其他服务创建了该桶，存在并发创建，如果其他服务成功创建，当前服务进行下一次循环将不走创建桶的逻辑
                     log.error("桶创建失败:{}", bucketPrefix + dateStr);
                     try {
                         TimeUnit.SECONDS.sleep(10);
@@ -111,7 +112,7 @@ public class ScheduledUpload {
                     }
                     continue;
                 }
-            }
+            } else break;
         }
 
         /**
