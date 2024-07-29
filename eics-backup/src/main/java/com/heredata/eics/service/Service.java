@@ -1,44 +1,23 @@
 package com.heredata.eics.service;
 
-import com.alibaba.fastjson.JSON;
-import com.heredata.eics.entity.MailDTO;
 import com.heredata.eics.entity.MailEntity;
-import com.heredata.eics.task.ScheduledUpload;
 import com.heredata.eics.utils.EicsUtils;
-import com.heredata.exception.ServiceException;
 import com.heredata.hos.HOS;
 import com.heredata.hos.model.*;
 import com.heredata.hos.model.bucket.Bucket;
 import com.heredata.hos.model.bucket.BucketList;
-import com.heredata.hos.model.bucket.BucketVersioningConfiguration;
-import com.heredata.model.VoidResult;
 import com.heredata.swift.model.DownloadFileRequest;
 import com.heredata.utils.StringUtils;
 import com.sitech.cmap.fw.core.wsg.WsgPageResult;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.catalina.Lifecycle;
 import org.springframework.beans.factory.annotation.Value;
 
 import javax.annotation.Resource;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.nio.charset.StandardCharsets;
-import java.rmi.RemoteException;
 import java.text.DecimalFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -312,21 +291,22 @@ public class Service {
 
     /**
      * 设置桶的生命周期
-     * @param bucketName
+     * @param bucketNames
      * @return
      */
-    public Boolean setBucketLife(String bucketName) {
-
-        // 设置桶的生命周期
-        SetBucketLifecycleRequest setBucketLifecycleRequest = new SetBucketLifecycleRequest();
-        setBucketLifecycleRequest.setBucketName(bucketName);
-        LifecycleRule lifecycleRule = new LifecycleRule();
-        lifecycleRule.setStatus(LifecycleRule.RuleStatus.Enabled);
-        lifecycleRule.setFilter(new LifecycleRule.Filter());
-        LifecycleRule.Expiration expiration = new LifecycleRule.Expiration(expirationDays);
-        lifecycleRule.setExpiration(expiration);
-        setBucketLifecycleRequest.getLifecycleRules().add(lifecycleRule);
-        hos.setBucketLifecycle(setBucketLifecycleRequest);
+    public Boolean setBucketLife(List<String> bucketNames) {
+        for (String bucketName : bucketNames) {
+            // 设置桶的生命周期
+            SetBucketLifecycleRequest setBucketLifecycleRequest = new SetBucketLifecycleRequest();
+            setBucketLifecycleRequest.setBucketName(bucketName);
+            LifecycleRule lifecycleRule = new LifecycleRule();
+            lifecycleRule.setStatus(LifecycleRule.RuleStatus.Enabled);
+            lifecycleRule.setFilter(new LifecycleRule.Filter());
+            LifecycleRule.Expiration expiration = new LifecycleRule.Expiration(expirationDays);
+            lifecycleRule.setExpiration(expiration);
+            setBucketLifecycleRequest.getLifecycleRules().add(lifecycleRule);
+            hos.setBucketLifecycle(setBucketLifecycleRequest);
+        }
         return true;
     }
 
@@ -413,5 +393,28 @@ public class Service {
             }
         }
         return false;
+    }
+
+    public Map<String, List<LifecycleRule>> getBucketLife() {
+        Map<String, List<LifecycleRule>> map = new HashMap<>();
+        List<Bucket> list = hos.listBuckets();
+        for (Bucket bucket : list) {
+            List<LifecycleRule> bucketLifecycle = hos.getBucketLifecycle(bucket.getBucketName());
+            map.put(bucket.getBucketName(), bucketLifecycle);
+        }
+        return map;
+    }
+
+
+    public List<Bucket> listBuckets() {
+        List<Bucket> list = hos.listBuckets();
+        // 进行降序排序
+        list.sort(new Comparator<Bucket>() {
+            @Override
+            public int compare(Bucket o1, Bucket o2) {
+                return Long.compare(o2.getCreationDate().getTime(), o1.getCreationDate().getTime());
+            }
+        });
+        return list;
     }
 }

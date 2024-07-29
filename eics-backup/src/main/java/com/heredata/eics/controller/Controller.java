@@ -2,12 +2,14 @@ package com.heredata.eics.controller;
 
 import com.heredata.eics.service.Service;
 import com.heredata.hos.model.HOSVersionSummary;
+import com.heredata.hos.model.LifecycleRule;
 import com.heredata.hos.model.bucket.Bucket;
 import com.sitech.cmap.fw.core.wsg.WsgPageResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/eics")
@@ -99,11 +101,20 @@ public class Controller {
         return service.upload(date);
     }
 
-    @GetMapping("/setBucketLife")
-    public boolean setBucketLife(String bucketName) {
-        return service.setBucketLife(bucketName);
+    @PostMapping("/setBucketLife")
+    public boolean setBucketLife(@RequestBody List<String> list) {
+        return service.setBucketLife(list);
     }
 
+    @GetMapping("listBuckets")
+    public List<Bucket> listBuckets(){
+        return service.listBuckets();
+    }
+
+    @GetMapping("/getBucketLife")
+    public Map<String, List<LifecycleRule>> getBucketLife() {
+        return service.getBucketLife();
+    }
 
     @GetMapping("/upoadSingleObject")
     public boolean upoadSingleObject(String fileName) throws Throwable {

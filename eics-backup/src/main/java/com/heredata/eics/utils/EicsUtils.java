@@ -3,6 +3,7 @@ package com.heredata.eics.utils;
 import com.alibaba.fastjson.JSON;
 import com.heredata.eics.entity.MailDTO;
 import com.heredata.eics.entity.MailEntity;
+import com.heredata.eics.service.Service;
 import com.heredata.hos.HOS;
 import com.heredata.hos.model.AccountInfo;
 import com.heredata.hos.model.CompleteMultipartUploadResult;
@@ -28,8 +29,10 @@ import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -69,8 +72,11 @@ public class EicsUtils {
     @Value("${threadNum}")
     private int threadNum;
 
+    @Value("${expirationDays}")
+    private int expirationDays;
+
     @Resource
-    HOS hos;
+    private HOS hos;
 
     /**
      * 上传该路径下的文件
@@ -95,7 +101,7 @@ public class EicsUtils {
                 long newPartSize = -1;
                 if (file.length() / (partSize * 1024 * 1024) > 150) {
                     // 如果该文件的分片大于200片，就不行，需要限制在200片
-                    log.info("该文件太大，需要调整切片，按照150片上传该文件");
+                    log.info("该文件太大，需要调整切片，按照200片上传该文件");
                     newPartSize = file.length() / 200;
                 }
 
@@ -173,7 +179,17 @@ public class EicsUtils {
         stringBuffer.append("租户id：").append(accountId).append("\n");
         stringBuffer.append("桶前缀：").append(bucketPrefix).append("\n\n");
 
+        // 先获取桶信息，将桶中的size为0的桶进行删除处理，这样账户信息的桶数量才准确
+        List<Bucket> list = getBucketInfo();
+        // 进行降序排序
+        list.sort(new Comparator<Bucket>() {
+            @Override
+            public int compare(Bucket o1, Bucket o2) {
+                return Long.compare(o2.getCreationDate().getTime(), o1.getCreationDate().getTime());
+            }
+        });
 
+        // 获取账户信息
         AccountInfo accountInfo = hos.getAccountInfo();
         stringBuffer.append("账户使用详情：").append('\n')
                 .append("\t\t").append("桶数量：").append(accountInfo.getBucketCount()).append("\n")
@@ -184,7 +200,6 @@ public class EicsUtils {
         stringBuffer.append("\n");
 
         stringBuffer.append("桶基础信息如下：\n");
-        List<Bucket> list = getBucketInfo();
         for (Bucket bucket : list) {
             stringBuffer.append("bucketName=").append(bucket.getBucketName()).append(",")
                     .append("used=").append(bucket.getBytesUsed()).append(",")
@@ -201,6 +216,15 @@ public class EicsUtils {
         int successCount = 0;
         long totalSize = 0;
         long time = 0;
+
+        // 对ans进行排序，耗时降序排序
+        ans.sort(new Comparator<MailEntity>() {
+            @Override
+            public int compare(MailEntity o1, MailEntity o2) {
+                return Long.compare(o2.getConsumerTime(), o1.getConsumerTime());
+            }
+        });
+
         for (MailEntity an : ans) {
             if (an.isSuccess()) {
                 successCount++;
@@ -255,6 +279,9 @@ public class EicsUtils {
     @Value("${bucketPrefix}")
     private String bucketPrefix;
 
+    @Resource
+    private Service service;
+
     /**
      * 查询所有桶详情
      * @return
@@ -263,6 +290,21 @@ public class EicsUtils {
         BucketList bucketList = hos.listBuckets(bucketPrefix, null, null);
         List<Bucket> ans = new ArrayList<>();
         for (Bucket bucket : bucketList.getBuckets()) {
+            /**
+             * 以下是删除过期桶逻辑，未经测试
+             */
+//            log.info("桶详细信息如下:" + bucket.toString());
+//            if (bucket.getBytesUsed() == 0
+//                    && (System.currentTimeMillis() - bucket.getCreationDate().getTime()) > (1000 * 60 * 60 * 24 * (expirationDays + 1))) {
+//                // 该分支表示，桶使用大小为0，并且已经过期，就进行删除桶操作
+//                try {
+//                    service.deleteBucket(bucket.getBucketName(), true);
+//                } catch (Exception e) {
+//                    log.error("桶删除失败:" + bucket.toString());
+//                }
+//            } else {
+//                ans.add(hos.getBucketInfo(bucket.getBucketName()));
+//            }
             ans.add(hos.getBucketInfo(bucket.getBucketName()));
         }
         return ans;
@@ -300,6 +342,27 @@ public class EicsUtils {
 
 
     public static void main(String[] args) {
+        List<MailEntity> list = new ArrayList<>();
+        MailEntity mailEntity = new MailEntity();
+        mailEntity.setFileName("aaaa");
+        mailEntity.setConsumerTime(100L);
+
+        list.add(mailEntity);
+
+        mailEntity = new MailEntity();
+        mailEntity.setFileName("bbb");
+        mailEntity.setConsumerTime(200L);
+
+        list.add(mailEntity);
+
+        list.sort(new Comparator<MailEntity>() {
+            @Override
+            public int compare(MailEntity o1, MailEntity o2) {
+                return Long.compare(o2.getConsumerTime(), o1.getConsumerTime());
+            }
+        });
+
+
         String aa = "172.18.238.103_backup_3319_202407020400.xbstream.gz";
 
         int i = aa.lastIndexOf("_");

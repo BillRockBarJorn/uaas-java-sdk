@@ -12,8 +12,7 @@ import java.util.concurrent.*;
 
 import static com.heredata.comm.HttpConstants.DEFAULT_BUFFER_SIZE;
 import static com.heredata.comm.HttpConstants.KB;
-import static com.heredata.swift.utils.SwiftUtils.ensureBucketNameValid;
-import static com.heredata.swift.utils.SwiftUtils.ensureObjectKeyValid;
+import static com.heredata.swift.utils.SwiftUtils.*;
 import static com.heredata.utils.CodingUtils.assertParameterNotNull;
 import static com.heredata.utils.LogUtils.logException;
 
@@ -337,7 +336,7 @@ public class SwiftDownloadOperation {
 
         assertParameterNotNull(bucketName, "bucketName");
         assertParameterNotNull(key, "key");
-        ensureBucketNameValid(bucketName);
+        ensureBucketNameCreationValid(bucketName);
         ensureObjectKeyValid(key);
 
         // the download file name is not specified, using the key as the local
