@@ -10,6 +10,7 @@ import com.heredata.swift.comm.SWIFTRequestMessage;
 import com.heredata.swift.internal.RequestMessageBuilder;
 import com.heredata.swift.model.*;
 import com.heredata.swift.model.bucket.*;
+import com.heredata.utils.HttpUtil;
 import com.heredata.utils.StringUtils;
 
 import java.util.HashMap;
@@ -17,10 +18,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.heredata.comm.HttpConstants.DEFAULT_CHARSET_NAME;
 import static com.heredata.hos.comm.HOSRequestParameters.*;
 import static com.heredata.swift.parser.ResponseParsers.*;
 import static com.heredata.swift.utils.SwiftUtils.ensureBucketNameCreationValid;
 import static com.heredata.utils.CodingUtils.assertParameterNotNull;
+import static com.heredata.utils.ResourceUtils.urlEncodeKey;
 
 
 /**
@@ -320,11 +323,11 @@ public class SwiftBucketOperation extends SwiftOperation {
         }
 
         if (listObjectsRequest.getStartAfter() != null) {
-            params.put(START_AFTER, listObjectsRequest.getStartAfter());
+            params.put(MARKER, listObjectsRequest.getStartAfter());
         }
 
         if (listObjectsRequest.getMaxKeys() != null) {
-            params.put(MAX_KEYS, Integer.toString(listObjectsRequest.getMaxKeys()));
+            params.put(LIMIT, Integer.toString(listObjectsRequest.getMaxKeys()));
         }
 
         params.put("format", "json");

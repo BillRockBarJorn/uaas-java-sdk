@@ -15,6 +15,7 @@ import com.heredata.swift.model.bucket.BucketAclRequest;
 import com.heredata.swift.model.bucket.BucketQuotaResult;
 import com.heredata.swift.model.bucket.BukcetListResult;
 import com.heredata.utils.DateUtil;
+import com.heredata.utils.HttpUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -32,8 +33,7 @@ import static com.heredata.HttpHeaders.CONTENT_TYPE;
 import static com.heredata.HttpHeaders.ETAG;
 import static com.heredata.swift.comm.SwiftHeaders.X_OPENSTACK_REQUEST_ID;
 import static com.heredata.utils.ResourceUtils.safeCloseResponse;
-import static com.heredata.utils.StringUtils.isNullOrEmpty;
-import static com.heredata.utils.StringUtils.trimQuotes;
+import static com.heredata.utils.StringUtils.*;
 
 public final class ResponseParsers {
     public static final ListBucketResponseParser listBucketResponseParser = new ListBucketResponseParser();
@@ -385,7 +385,8 @@ public final class ResponseParsers {
                 swiftObjectSummary.setBucketName(bucketName);
                 swiftObjectSummary.setETag(jsonObject.getString("hash"));
                 swiftObjectSummary.setLastModified(DateUtil.parseIso8601Date(jsonObject.getString("last_modified")));
-                swiftObjectSummary.setKey(URLDecoder.decode(jsonObject.getString("name"), "UTF-8"));
+
+                swiftObjectSummary.setKey(jsonObject.getString("name"));
                 swiftObjectSummary.setSize(Long.valueOf(jsonObject.getString("bytes")));
                 result.addObjectSummary(swiftObjectSummary);
             }

@@ -16,7 +16,7 @@ import lombok.Data;
 @Data
 public class ListObjectsRequest extends GenericRequest {
     /**
-     * 每次查询对象数量列表的做大致
+     * 每次查询对象数量列表的做大值
      */
     private static final int MAX_RETURNED_KEYS_LIMIT = 1000;
 

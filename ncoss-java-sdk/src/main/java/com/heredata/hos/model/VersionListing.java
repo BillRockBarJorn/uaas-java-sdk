@@ -22,7 +22,7 @@ import java.util.List;
 @NoArgsConstructor
 public class VersionListing extends GenericResult {
     /**
-     * 班队对象列表  {@link HOSVersionSummary}
+     * 对象列表  {@link HOSVersionSummary}
      */
     private List<HOSVersionSummary> versionSummaries =
             new ArrayList<HOSVersionSummary>();

@@ -52,6 +52,8 @@ public final class HOSRequestParameters {
      */
     public static final String PREFIX = "prefix";
     public static final String START_AFTER = "start-after";
+    public static final String MARKER = "marker";
+    public static final String LIMIT = "limit";
     public static final String MAX_KEYS = "max-keys";
     public static final String VERSION_ID_MARKER = "version-id-marker";
     public static final String MAX_UPLOADS = "max-uploads";
