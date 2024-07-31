@@ -1,24 +1,20 @@
 package com.heredata.eics.service;
 
+import com.google.common.collect.Lists;
 import com.heredata.eics.utils.HosClient;
 import com.heredata.eics.utils.SwOSSClient;
 import com.heredata.exception.ClientException;
 import com.heredata.exception.ServiceException;
-import com.heredata.hos.HOS;
-import com.heredata.hos.model.bucket.Bucket;
 import com.heredata.swift.Swift;
 import com.heredata.swift.SwiftClientBuilder;
 import com.heredata.swift.model.*;
-import com.sitech.cmap.fw.core.common.EmptyValidator;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-
-import javax.annotation.Resource;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.*;
 
 @org.springframework.stereotype.Service
 @Slf4j
@@ -27,13 +23,11 @@ public class HsmService extends HosClient {
     @Value("${scannerPath}")
     private String scannerPath;
 
-    KeyInformation originInfo=SwOSSClient.originIden();
-    Swift oriObj = new SwiftClientBuilder().build(originInfo.getEndPoint(), originInfo.getAccount(), originInfo.getXSubjectToken());
+    @Value("${fileThread}")
+    private String fileThread;
 
-    KeyInformation taInfo=SwOSSClient.tarIden();
 
-    Swift taObj = new SwiftClientBuilder().build(taInfo.getEndPoint(), taInfo.getAccount(), taInfo.getXSubjectToken());
-    /**
+      /**
      * *
      *@Title  dataHier
      *@Description   桶集数据迁移
@@ -44,6 +38,14 @@ public class HsmService extends HosClient {
      *@version 1.0
      */
     public boolean dataHier(String bucketName) throws Throwable {
+
+        KeyInformation originInfo=SwOSSClient.originIden();
+        Swift oriObj = new SwiftClientBuilder().build(originInfo.getEndPoint(), originInfo.getAccount(), originInfo.getXSubjectToken());
+
+        KeyInformation taInfo=SwOSSClient.tarIden();
+
+        Swift taObj = new SwiftClientBuilder().build(taInfo.getEndPoint(), taInfo.getAccount(), taInfo.getXSubjectToken());
+
         Boolean res=false;
         List<SwiftObjectSummary> objectSummaries=new ArrayList<SwiftObjectSummary>();
         try {
@@ -52,17 +54,30 @@ public class HsmService extends HosClient {
             ObjectListing objectListing = oriObj.listObjects(listObjectsRequest);
             //对象列表
             objectSummaries=objectListing.getObjectSummaries();
-
-             if (EmptyValidator.isNotEmpty(objectListing)){
-                for (SwiftObjectSummary obj:objectSummaries){
+            log.info("文件的数量:"+objectSummaries.size());
+            //线程
+            ExecutorService executorService = Executors.newFixedThreadPool(Integer.parseInt(fileThread));
+            for (SwiftObjectSummary obj: objectSummaries) {
+              //  executorService.execute(() -> {
                     //文件下载
-                    boolean loadFile=  downloadObject(bucketName,obj.getKey());
-                    //文件下载成功，再上传
-                    if (loadFile){
-                        createObject(bucketName,obj.getKey());
+                    boolean loadFile= false;
+                    try {
+                        loadFile = downloadObject(oriObj,bucketName,obj.getKey());
+                        //文件下载成功，再上传
+                        if (loadFile){
+                            createObject(taObj,bucketName,obj.getKey());
+                        }
+                    } catch (Throwable e) {
+                        log.error("file Message:" + e.getMessage());
                     }
-                }
-             }
+              //  });
+            }
+
+            // 关闭ExecutorService
+           // executorService.shutdown();
+
+            log.info("上传完成,上传:"+objectSummaries.size()+"个文件");
+
               res=true;
         } catch (ServiceException oe) {
             log.error("Error Message:" + oe.getErrorMessage());
@@ -82,10 +97,12 @@ public class HsmService extends HosClient {
 
 
 
-    public Boolean downloadObject(String bucket, String obj)  throws Throwable {
+    public Boolean downloadObject(Swift oriObj,String bucket, String obj)  throws Throwable {
         Boolean is=false;
-        // 普通下载
+
+          // 普通下载
         DownloadFileRequest downloadFileRequest = new DownloadFileRequest(bucket, obj);
+        downloadFileRequest.setDownloadFile(scannerPath+obj);
         try {
             DownloadFileResult downloadFileResult = oriObj.downloadObject(downloadFileRequest);
                 is=true;
@@ -99,9 +116,10 @@ public class HsmService extends HosClient {
 
 
 
-    public void createObject(String bucket, String obj) throws FileNotFoundException {
+    public void createObject(Swift taObj,String bucket, String obj) throws FileNotFoundException {
         // 设置对象的元数据
-        PutObjectRequest putObjectRequest = new PutObjectRequest( bucket,  obj, new FileInputStream(scannerPath+"/"+obj));
+
+        PutObjectRequest putObjectRequest = new PutObjectRequest( bucket,  obj, new FileInputStream(scannerPath+obj));
         try {
             PutObjectResult example = taObj.putObject(putObjectRequest);
             if (example.getResponse().isSuccessful()) {

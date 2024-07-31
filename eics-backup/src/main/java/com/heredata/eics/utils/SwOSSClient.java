@@ -14,36 +14,35 @@ public class SwOSSClient {
 
 
 
-    @Value("${originEndPoint}")
-    private static String originEndPoint;
 
-    @Value("${userName}")
-    private static String userName;
+    private static String originEndPoint="http://172.18.239.18:8093/v1/";
 
-    @Value("${password}")
-    private static String password;
 
-    @Value("${scopeName}")
-    private static String scopeName;
+    private static String userName="8635110001";
 
-    @Value("${uaasURL}")
-    private static String uaasURL;
 
-    @Value("${TaendPoint}")
-    private static String TaendPoint;
+    private static String password="$&&@!1!@1%84";
 
-    @Value("${TauserName}")
-    private static String TauserName;
 
-    @Value("${Tapassword}")
-    private static String Tapassword;
+    private static String scopeName="8635110001";
 
-    @Value("${TascopeName}")
-    private static String TascopeName;
 
-    @Value("${TauaasURL}")
-    private static String TauaasURL;
+    private static String uaasURL="http://172.18.239.16:8088/v3/auth/tokens";
 
+
+    private static String TaendPoint="http://10.86.8.201:27741/v1/";
+
+
+    private static String TauserName="backupSys";
+
+
+    private static String Tapassword="HereData#!@2023";
+
+
+    private static String TascopeName="backupSys";
+
+
+    private static String TauaasURL= "http://10.86.8.201:27731/v3/auth/tokens";
 
     //源认证
     public static KeyInformation originIden() {
