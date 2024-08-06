@@ -146,7 +146,7 @@ public class ScheduledUpload {
             mailEntity.setFileName(file1.getName());
             mailEntity.setSize(file1.length());
             try {
-                boolean isSuccess = eicsUtils.uploadFile(bucketPrefix + dateStr, file1, mailEntity);
+            //    boolean isSuccess = eicsUtils.uploadFile(bucketPrefix + dateStr, file1, mailEntity);
                 totalSize += file1.length();
             } catch (Exception e) {
                 log.error("上传文件发生异常，错误信息：" + e.getMessage());
@@ -159,7 +159,7 @@ public class ScheduledUpload {
         double number = ((double) totalSize / (double) (1024 * 1024 * 1024));
         log.info("本次备份总耗时：{},文件总大小为：{} GB", (System.currentTimeMillis() - start0), df.format(number));
         // 开始组装邮件内容
-        eicsUtils.generateMailContentAndSend(ans);
+       // eicsUtils.generateMailContentAndSend(ans);
     }
 
 
