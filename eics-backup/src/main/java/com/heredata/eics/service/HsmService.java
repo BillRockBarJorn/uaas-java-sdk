@@ -32,11 +32,11 @@ public class HsmService extends HosClient {
     @Value("${fileThread}")
     private String fileThread;
 
-    @Autowired
+    @Resource
     AsyncConfig asyncConfig;
 
     @Value("${MetaStor}")
-    private boolean MetaStor;
+    private boolean metaStor;
 
     private static String ak="RU7WSH6Y9HAFCYNIX0QT";
 
@@ -168,15 +168,15 @@ public class HsmService extends HosClient {
                 try {
                     log.info("file 大小:" + EicsUtils.converseFileSize(obj.getSize()));
                     //文件大小
-                    String maxSize="5368709120";
-                    if (obj.getSize()>=Long.valueOf(maxSize)) {
+                    Long maxSize=5368709120L;
+                    if (obj.getSize()>=maxSize) {
                         //文件大于5G使用命令行上传
                         upFile=  uploadByHosCmd(bucketName,obj.getKey());
                     }else{
                         upFile= createObject(taObj,bucketName,obj.getKey());
                     }
-
-                    if (upFile){
+                    //文件上传失败会形成集合
+                    if (!upFile){
                         faileSummaries.add(obj);
                     }
                 } catch (Throwable e) {
@@ -387,7 +387,7 @@ public class HsmService extends HosClient {
 
     }
     @Async
-    public boolean dataObj(List<TbSwiftBackupFileTree> objects) {
+    public boolean dataObj(@org.jetbrains.annotations.NotNull List<TbSwiftBackupFileTree> objects) {
 
         KeyInformation originInfo=SwOSSClient.originIden();
         Swift oriObj = new SwiftClientBuilder().build(originInfo.getEndPoint(), originInfo.getAccount(), originInfo.getXSubjectToken());
@@ -617,4 +617,6 @@ public class HsmService extends HosClient {
         }
 
     }
+
+
 }

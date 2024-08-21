@@ -11,7 +11,13 @@ public class EicsApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(EicsApplication.class, args);
-        System.out.println("启动成功");
+        System.out.println("============启动成功====================");
+    }
+
+    @Bean
+    public CommandLineRunner run(DirDataService dirDataService) {
+        // 调用方法执行全量备份
+        return args -> {dirDataService.fullFir();};
     }
 
 }
