@@ -71,13 +71,13 @@ public class DirDataService {
 
     }
 
-
-    @Async
-    public void uploadFull(){
+    public  boolean  bucketInfo(String bucketName){
+        Boolean isExist = false;
         // 先查询桶是否存在,不存在就创建，对接备份平台 当前用户只有一个桶
         if (!hos.doesBucketExist(bucketName)) {
             try {
                 hos.createBucket(bucketName);
+                isExist = true;
             } catch (Exception e) {
                 log.error("桶创建失败:{}", bucketName);
                 try {
@@ -87,25 +87,32 @@ public class DirDataService {
                 }
             }
         }
+        return isExist;
+    }
 
-
-        File file = new File(scannerPath);
-        File[] files = file.listFiles();
-
-        //目录首次全量备份
-        asyload(bucketName, Arrays.asList(files),"upload");
+    public void uploadFull(){
+        //bucket判断是否存在，不存在就创建
+        if (bucketInfo(bucketName)) {
+            //  File file = new File(scannerPath);
+            File[] files = new File(scannerPath).listFiles();
+            if (files !=null){
+                log.info("执行上传任务,扫描路径为:" + scannerPath+",文件数量:"+files.length);
+                //目录首次全量备份
+                asyload(bucketName, Arrays.asList(files),"upload");
+            }else{
+                log.info("备份目录为空，无文件");
+            }
+        }
     }
 
 
     public  boolean asyload(String bucketName, List<File> objectSummaries, String load){
         Boolean res=false;
         if (EmptyValidator.isNotEmpty(objectSummaries)) {
-            log.info("执行上传任务,扫描路径为:" + scannerPath+",文件数量:"+objectSummaries.size());
             try {
                 //线程池开启
                 Executor executor = asyncConfig.taskExecutor();
-
-                //文件迁移，回收成集合，进行二次上传(失败包括下载失败以及文件上传失败)
+                //文件集合，为下步执行
                 List<MailEntity> totalFile = new ArrayList<>();
 
                 if (objectSummaries.size() > 1000) {
@@ -157,8 +164,7 @@ public class DirDataService {
         List<MailEntity> ans = new ArrayList<>();
         // 遍历需要上传的文件集合
         for (File file1 : files) {
-            log.info("扫描到文件：" + file1.toString());
-            log.info("开始上传========================================================");
+            log.info("扫描到文件：" + file1.toString()+",开始上传");
             long start = System.currentTimeMillis();
             MailEntity mailEntity = new MailEntity();
             mailEntity.setBucketName(bucketName);
