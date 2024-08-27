@@ -20,7 +20,7 @@ import java.util.concurrent.ThreadPoolExecutor;
  * @version 1.0
  * @createtime 2020-05-13 14:22
  */
-
+@Configuration
 public class AsyncConfig {
 
         @Value( "${core.pool.size}" )
