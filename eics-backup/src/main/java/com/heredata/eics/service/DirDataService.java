@@ -71,7 +71,7 @@ public class DirDataService {
 
     }
 
-    public  boolean  bucketInfo(String bucketName){
+    public  void  bucketInfo(String bucketName){
         Boolean isExist = false;
         // 先查询桶是否存在,不存在就创建，对接备份平台 当前用户只有一个桶
         if (!hos.doesBucketExist(bucketName)) {
@@ -87,13 +87,12 @@ public class DirDataService {
                 }
             }
         }
-        return isExist;
+
     }
 
     public void uploadFull(){
         //bucket判断是否存在，不存在就创建
-        if (bucketInfo(bucketName)) {
-            //  File file = new File(scannerPath);
+         bucketInfo(bucketName);
             File[] files = new File(scannerPath).listFiles();
             if (files !=null){
                 log.info("执行上传任务,扫描路径为:" + scannerPath+",文件数量:"+files.length);
@@ -102,7 +101,7 @@ public class DirDataService {
             }else{
                 log.info("备份目录为空，无文件");
             }
-        }
+
     }
 
 

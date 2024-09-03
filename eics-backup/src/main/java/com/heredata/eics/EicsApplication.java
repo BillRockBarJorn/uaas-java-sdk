@@ -1,7 +1,10 @@
 package com.heredata.eics;
 
+import com.heredata.eics.service.DirDataService;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 // 启动类
@@ -14,10 +17,10 @@ public class EicsApplication {
         System.out.println("============启动成功====================");
     }
 
-    @Bean
+   /* @Bean
     public CommandLineRunner run(DirDataService dirDataService) {
         // 调用方法执行全量备份
         return args -> {dirDataService.fullFir();};
-    }
+    }*/
 
 }

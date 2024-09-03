@@ -1,6 +1,7 @@
 package com.heredata.eics.controller;
 
 import com.heredata.eics.entity.oss.TbSwiftBackupFileTree;
+import com.heredata.eics.service.DirDataService;
 import com.heredata.eics.service.HsmService;
 import lombok.SneakyThrows;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +19,9 @@ public class HsmController {
 
     @Resource
     private HsmService hoervice;
+
+    @Resource
+    private DirDataService dirDataService;
 
 
     @SneakyThrows
@@ -37,7 +41,7 @@ public class HsmController {
 
     @GetMapping("/data/account")
     public void accountMigrate() {
-         hoervice.accountData();
+      //   hoervice.accountData();
     }
 
     @GetMapping("/buckets")

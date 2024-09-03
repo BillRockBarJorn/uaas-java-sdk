@@ -1,23 +1,27 @@
 package com.heredata.eics.service;
 
 import com.google.common.collect.Lists;
+import com.heredata.eics.config.Thread.AsyncConfig;
 import com.heredata.eics.entity.oss.TbSwiftBackupFileTree;
+import com.heredata.eics.utils.EicsUtils;
 import com.heredata.eics.utils.HosClient;
 import com.heredata.eics.utils.SwOSSClient;
 import com.heredata.exception.ClientException;
 import com.heredata.exception.ServiceException;
+import com.heredata.model.VoidResult;
 import com.heredata.swift.Swift;
 import com.heredata.swift.SwiftClientBuilder;
 import com.heredata.swift.model.*;
 import com.heredata.swift.model.bucket.Bucket;
+import com.sitech.cmap.fw.core.common.EmptyValidator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 
+import javax.annotation.Resource;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
@@ -33,7 +37,7 @@ public class HsmService extends HosClient {
     private String fileThread;
 
     @Resource
-    AsyncConfig asyncConfig;
+     private AsyncConfig asyncConfig;
 
     @Value("${MetaStor}")
     private boolean metaStor;
@@ -386,8 +390,8 @@ public class HsmService extends HosClient {
         return null;
 
     }
-    @Async
-    public boolean dataObj(@org.jetbrains.annotations.NotNull List<TbSwiftBackupFileTree> objects) {
+
+    public boolean dataObj(List<TbSwiftBackupFileTree> objects) {
 
         KeyInformation originInfo=SwOSSClient.originIden();
         Swift oriObj = new SwiftClientBuilder().build(originInfo.getEndPoint(), originInfo.getAccount(), originInfo.getXSubjectToken());
