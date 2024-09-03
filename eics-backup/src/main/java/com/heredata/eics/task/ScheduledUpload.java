@@ -55,6 +55,12 @@ public class ScheduledUpload {
     @Value("${isDeleteHistory}")
     private boolean isDeleteHistory;
 
+    @Value("${isStartAutoUpload:false}")
+    private boolean isStartAutoUpload;
+
+    @Value("${isSendMail:false}")
+    private boolean isSendMail;
+
     @Value("${expirationDays}")
     private int expirationDays;
 
@@ -75,6 +81,8 @@ public class ScheduledUpload {
      */
     @Scheduled(cron = "${cron}")
     public void upload() throws ParseException {
+        // 如果不开启自动定时任务，直接返回，开启是true，不开启是false
+        if (!isStartAutoUpload) return;
         long start0 = System.currentTimeMillis();
         startTime = start0;
         /**
@@ -126,6 +134,7 @@ public class ScheduledUpload {
         List<File> collect1 = Arrays.stream(files).filter(item -> {
             long l = item.lastModified();
             String format = EicsUtils.format_yyyyMMdd.format(new Date(l));
+            log.info("format:{},dateStr:{},fileName:{}", format, dateStr, item.getName());
             if (dateStr.equals(format) && item.getName().contains(dateStr)) {
                 return true;
             } else {
@@ -138,7 +147,7 @@ public class ScheduledUpload {
         List<MailEntity> ans = new ArrayList<>();
         // 遍历需要上传的文件集合
         for (File file1 : collect1) {
-            log.info("扫描到文件：" + file1.toString());
+            log.info("扫描到文件：{}，文件大小:{}", file1.toString(), file1.getTotalSpace());
             log.info("开始上传=====================================================================================================================");
             long start = System.currentTimeMillis();
             MailEntity mailEntity = new MailEntity();
@@ -146,7 +155,7 @@ public class ScheduledUpload {
             mailEntity.setFileName(file1.getName());
             mailEntity.setSize(file1.length());
             try {
-            //    boolean isSuccess = eicsUtils.uploadFile(bucketPrefix + dateStr, file1, mailEntity);
+                boolean isSuccess = eicsUtils.uploadFile(bucketPrefix + dateStr, file1, mailEntity);
                 totalSize += file1.length();
             } catch (Exception e) {
                 log.error("上传文件发生异常，错误信息：" + e.getMessage());
@@ -158,8 +167,10 @@ public class ScheduledUpload {
         }
         double number = ((double) totalSize / (double) (1024 * 1024 * 1024));
         log.info("本次备份总耗时：{},文件总大小为：{} GB", (System.currentTimeMillis() - start0), df.format(number));
+        // 如果不需要发送邮件，直接return
+        if (!isSendMail) return;
         // 开始组装邮件内容
-       // eicsUtils.generateMailContentAndSend(ans);
+        eicsUtils.generateMailContentAndSend(ans);
     }
 
 

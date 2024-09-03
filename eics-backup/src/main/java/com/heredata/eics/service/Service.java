@@ -217,9 +217,10 @@ public class Service {
                     setBucketLifecycleRequest.getLifecycleRules().add(lifecycleRule);
                     setBucketLifecycleRequest.setBucketName(bucketPrefix + dateStr);
                     hos.setBucketLifecycle(setBucketLifecycleRequest);
+                    log.info("创建通成功:{}", bucketPrefix + dateStr);
                     break;
                 } catch (Exception e) {
-                    log.error("桶创建失败:{}", bucketPrefix + dateStr);
+                    log.warn("桶创建失败:{}", bucketPrefix + dateStr);
                     try {
                         TimeUnit.SECONDS.sleep(10);
                     } catch (InterruptedException interruptedException) {
@@ -254,7 +255,7 @@ public class Service {
         List<MailEntity> ans = new ArrayList<>();
         // 遍历需要上传的文件集合
         for (File file1 : collect1) {
-            log.info("扫描到文件：" + file1.toString());
+            log.info("扫描到文件：{}，文件大小:{}", file1.toString(), file1.getTotalSpace());
             log.info("开始上传=====================================================================================================================");
             long start = System.currentTimeMillis();
             MailEntity mailEntity = new MailEntity();
@@ -266,6 +267,7 @@ public class Service {
                 eicsUtils.uploadFile(bucketPrefix + dateStr, file1, mailEntity);
                 totalSize += file1.length();
             } catch (Exception e) {
+                log.info("上传失败，该文件file:{}", file1.getName(), System.currentTimeMillis() - start);
                 log.error("上传文件发生异常，错误信息：" + e.getMessage());
             } finally {
                 ans.add(mailEntity);

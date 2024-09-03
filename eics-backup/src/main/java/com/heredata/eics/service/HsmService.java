@@ -1,6 +1,5 @@
 package com.heredata.eics.service;
 
-import com.google.common.collect.Lists;
 import com.heredata.eics.entity.oss.TbSwiftBackupFileTree;
 import com.heredata.eics.utils.HosClient;
 import com.heredata.eics.utils.SwOSSClient;
@@ -21,6 +20,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @org.springframework.stereotype.Service
 @Slf4j
@@ -71,7 +71,7 @@ public class HsmService extends HosClient {
             List<SwiftObjectSummary> faileSummaries=new ArrayList<SwiftObjectSummary>();
             //线程
             ExecutorService executorService = Executors.newFixedThreadPool(Integer.parseInt(fileThread));
-                int i=0;
+                AtomicInteger i= new AtomicInteger();
             for (SwiftObjectSummary obj: objectSummaries) {
                 executorService.execute(() -> {
                     //文件下载
@@ -90,7 +90,7 @@ public class HsmService extends HosClient {
                                 createObject(taObj,bucketName,obj.getKey());
                             }
                         }
-                        i++;
+                        i.getAndIncrement();
                     } catch (Throwable e) {
                         log.error("file Message:" + e.getMessage());
                     }
@@ -242,7 +242,7 @@ public class HsmService extends HosClient {
      * *
      *@Title  createObject
      *@Description   调用接口上传
-     *@param [taObj, bucket, obj]
+     *@params [taObj, bucket, obj]
      *@return void
      *@creator dingrb
      *@creatTime  2024/8/1 10:22
