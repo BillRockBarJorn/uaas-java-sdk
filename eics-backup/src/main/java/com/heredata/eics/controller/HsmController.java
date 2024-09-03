@@ -46,4 +46,10 @@ public class HsmController {
     }
 
 
+    @GetMapping("/local/dir/full")
+    public void localFull() {
+        dirDataService.uploadFull();
+    }
+
+
 }
