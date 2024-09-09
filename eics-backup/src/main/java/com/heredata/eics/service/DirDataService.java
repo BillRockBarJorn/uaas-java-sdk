@@ -2,6 +2,7 @@ package com.heredata.eics.service;
 
 import com.google.common.collect.Lists;
 import com.heredata.eics.config.Thread.AsyncConfig;
+import com.heredata.eics.entity.AgentDTO;
 import com.heredata.eics.entity.MailEntity;
 import com.heredata.eics.utils.EicsUtils;
 import com.heredata.exception.ClientException;
@@ -17,6 +18,10 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.io.File;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,6 +45,9 @@ public class DirDataService {
 
     @Value("${bucket}")
     private String bucketName;
+
+    @Value("cron")
+    private String cron;
 
     @Resource
     AsyncConfig asyncConfig;
@@ -182,5 +190,34 @@ public class DirDataService {
         double number = ((double) totalSize / (double) (1024 * 1024 * 1024));
         log.info("本次备份总耗时：{},文件总大小为：{} GB", (System.currentTimeMillis() - startTime), df.format(number));
         return ans;
+    }
+
+
+
+
+
+    public  void getBaseAgent(){
+        InetAddress localHost = null;
+        try {
+            localHost = InetAddress.getLocalHost();
+
+            // 获取主机名
+            String hostName = localHost.getHostName();
+
+            Path scanInfo= Paths.get(scannerPath);
+
+            // 获取IP地址
+            String hostAddress = localHost.getHostAddress();
+
+            //生成主机的基本信息上传到平台
+            AgentDTO agentDTO = new AgentDTO(bucketName,hostAddress,0,scanInfo,cron);
+
+
+        } catch (UnknownHostException e) {
+            throw new RuntimeException(e);
+        }
+
+
+
     }
 }
