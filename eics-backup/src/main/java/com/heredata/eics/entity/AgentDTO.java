@@ -22,5 +22,6 @@ public class AgentDTO {
 
     private String frequ;
 
+    private boolean isTaskRunning;
 
 }

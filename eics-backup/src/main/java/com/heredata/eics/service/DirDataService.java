@@ -1,21 +1,25 @@
 package com.heredata.eics.service;
 
+import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
 import com.heredata.eics.config.Thread.AsyncConfig;
 import com.heredata.eics.entity.AgentDTO;
 import com.heredata.eics.entity.MailEntity;
+import com.heredata.eics.entity.ServerConfig;
+import com.heredata.eics.task.ScheduledUpload;
 import com.heredata.eics.utils.EicsUtils;
+import com.heredata.eics.utils.HttpClientUtil;
 import com.heredata.exception.ClientException;
 import com.heredata.exception.ServiceException;
 import com.heredata.hos.HOS;
 import com.sitech.cmap.fw.core.common.EmptyValidator;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-
 import javax.annotation.Resource;
 import java.io.File;
 import java.net.InetAddress;
@@ -55,9 +59,13 @@ public class DirDataService {
     @Resource
     EicsUtils eicsUtils;
 
+    @Resource
+    private ScheduledUpload scheduledUpload;
+
+    @Resource
+    private ServerConfig serverConfig;
+
     DecimalFormat df = new DecimalFormat("#.00");
-
-
 
 
     @SneakyThrows
@@ -195,11 +203,23 @@ public class DirDataService {
 
 
 
-
+    /**
+     *
+     * @Title: getBaseAgent
+     *
+     * @Description:  agent 基本信息
+     *
+     * @param []
+     *
+     * @return void
+     *
+     * @author dingrb
+     *
+     * @createtime 2024/9/4 14:21
+     */
     public  void getBaseAgent(){
-        InetAddress localHost = null;
         try {
-            localHost = InetAddress.getLocalHost();
+            InetAddress localHost = InetAddress.getLocalHost();
 
             // 获取主机名
             String hostName = localHost.getHostName();
@@ -208,16 +228,27 @@ public class DirDataService {
 
             // 获取IP地址
             String hostAddress = localHost.getHostAddress();
-
             //生成主机的基本信息上传到平台
-            AgentDTO agentDTO = new AgentDTO(bucketName,hostAddress,0,scanInfo,cron);
-
-
+            AgentDTO agentDTO = new AgentDTO(bucketName,hostAddress, serverConfig.getPort(), scanInfo,cron,scheduledUpload.isTaskRunning());
+            //数据发送
+            sendAgnetInfo(agentDTO);
         } catch (UnknownHostException e) {
             throw new RuntimeException(e);
         }
+    }
 
-
+    public  static void  sendAgnetInfo(AgentDTO agentDTO){
+        String url ="";
+        CloseableHttpResponse hrs;
+        HttpPost post = new HttpPost(url);
+        try {
+            hrs = HttpClientUtil.post(post,agentDTO);
+            hrs.close();
+        } catch (Exception e) {
+            log.info("getToken method Exception error:" + e.getMessage());
+        }
 
     }
+
+
 }

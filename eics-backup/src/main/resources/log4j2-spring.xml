@@ -10,7 +10,7 @@
 
     <loggers>
         <logger name="org.springframework" level="INFO"></logger>
-        <logger name="com.heredata.sdk" level="DEBUG"></logger>
+        <logger name="com.heredata.sdk" level="INFO"></logger>
         <root level="info">
             <appender-ref ref="Console"/>
         </root>
