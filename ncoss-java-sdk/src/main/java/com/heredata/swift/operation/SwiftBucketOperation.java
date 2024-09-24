@@ -222,10 +222,10 @@ public class SwiftBucketOperation extends SwiftOperation {
          */
         if (bucketAclRequest != null) {
             StringBuffer readStr = new StringBuffer();
-            if (bucketAclRequest.getAllUserReadObject()) {
+            if (bucketAclRequest.getAllUserReadObject() != null && bucketAclRequest.getAllUserReadObject()) {
                 readStr.append(".r:*").append(",");
             }
-            if (bucketAclRequest.getHeadOrGetBukcet()) {
+            if (bucketAclRequest.getHeadOrGetBukcet() != null && bucketAclRequest.getHeadOrGetBukcet()) {
                 readStr.append(".rlistings").append(",");
             }
             if (bucketAclRequest.getTokenRead() != null && !bucketAclRequest.getTokenRead().isEmpty()) {
@@ -245,7 +245,7 @@ public class SwiftBucketOperation extends SwiftOperation {
                 });
             }
 
-            if (',' == writeStr.toString().charAt(writeStr.length() - 1)) {
+            if (!StringUtils.isNullOrEmpty(writeStr.toString()) && ',' == writeStr.toString().charAt(writeStr.length() - 1)) {
                 head.put("X-Container-Write", writeStr.toString().substring(0, writeStr.length() - 1));
             }
         }
