@@ -229,6 +229,11 @@ public class ScheduledUpload {
     }
 
 
+    public boolean isTaskRunning() {
+        return isTaskRunning();
+    }
+
+
     public static void main(String[] args) throws URISyntaxException, IOException {
 
         System.out.println(EicsUtils.format_yyyyMMdd.format(new Date()));
