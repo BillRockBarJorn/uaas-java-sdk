@@ -24,6 +24,8 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
@@ -32,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -264,9 +267,10 @@ public class EicsUtils {
             HttpClient client = HttpClients.createDefault();
             HttpResponse execute = client.execute(httpPost);
             if (execute.getStatusLine().getStatusCode() / 200 == 1) {
-                log.info("发送邮件成功");
+                log.info("调用发送邮件接口成功");
             }
         } catch (Exception e) {
+            e.printStackTrace();
             log.error("发送邮件失败");
         }
 
@@ -290,21 +294,27 @@ public class EicsUtils {
         BucketList bucketList = hos.listBuckets(bucketPrefix, null, null);
         List<Bucket> ans = new ArrayList<>();
         for (Bucket bucket : bucketList.getBuckets()) {
-            /**
-             * 以下是删除过期桶逻辑，未经测试
-             */
-//            log.info("桶详细信息如下:" + bucket.toString());
-//            if (bucket.getBytesUsed() == 0
-//                    && (System.currentTimeMillis() - bucket.getCreationDate().getTime()) > (1000 * 60 * 60 * 24 * (expirationDays + 1))) {
-//                // 该分支表示，桶使用大小为0，并且已经过期，就进行删除桶操作
-//                try {
-//                    service.deleteBucket(bucket.getBucketName(), true);
-//                } catch (Exception e) {
-//                    log.error("桶删除失败:" + bucket.toString());
-//                }
-//            } else {
-//                ans.add(hos.getBucketInfo(bucket.getBucketName()));
-//            }
+            log.info("桶详细信息如下:" + bucket.toString());
+            if (bucket.getBytesUsed() == 0
+                    && (System.currentTimeMillis() - bucket.getCreationDate().getTime()) > (1000 * 60 * 60 * 24 * (expirationDays + 1))) {
+                // 该分支表示，桶使用大小为0，并且已经过期，就进行删除桶操作
+                while (hos.doesBucketExist(bucket.getBucketName())) {
+                    try {
+                        service.deleteBucket(bucket.getBucketName(), true);
+                        log.info("删除桶   " + bucket.getBucketName() + "  成功");
+                        break;
+                    } catch (Exception e) {
+                        log.warn("桶删除失败,休息3S:" + bucket.toString());
+                        try {
+                            TimeUnit.SECONDS.sleep(3);
+                        } catch (InterruptedException interruptedException) {
+                            interruptedException.printStackTrace();
+                        }
+                    }
+                }
+            } else {
+                ans.add(hos.getBucketInfo(bucket.getBucketName()));
+            }
             ans.add(hos.getBucketInfo(bucket.getBucketName()));
         }
         return ans;
@@ -331,13 +341,14 @@ public class EicsUtils {
 
 
     public static String converseFileSize(Long size) {
+        BigDecimal bigDecimal = new BigDecimal(size);
         String[] arr = new String[]{"B", "KB", "MB", "GB", "TB"};
         int index = 0;
-        while (size > 1024) {
-            size /= 1024;
+        while (bigDecimal.longValue() > 1024) {
+            bigDecimal = bigDecimal.divide(new BigDecimal(1024));
             index++;
         }
-        return size + arr[index];
+        return bigDecimal.setScale(4, RoundingMode.HALF_UP) + arr[index];
     }
 
 

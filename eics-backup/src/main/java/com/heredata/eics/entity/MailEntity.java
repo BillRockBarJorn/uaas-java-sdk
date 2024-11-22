@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -39,13 +42,14 @@ public class MailEntity {
 
     public void setSize(Long size) {
         this.size = size;
+        BigDecimal bigDecimal = new BigDecimal(size);
         String[] arr = new String[]{"B", "KB", "MB", "GB", "TB"};
         int index = 0;
-        while (size > 1024) {
-            size /= 1024;
+        while (bigDecimal.longValue() > 1024) {
+            bigDecimal = bigDecimal.divide(new BigDecimal(1024));
             index++;
         }
-        this.sizeStr = size + arr[index];
+        this.sizeStr = bigDecimal.setScale(4, RoundingMode.HALF_UP).toString() + arr[index];
     }
 
     @Override
@@ -60,4 +64,13 @@ public class MailEntity {
                 ", consumerTime=" + consumerTime +
                 '}';
     }
+
+    public static void main(String[] args) {
+
+        MailEntity mailEntity = new MailEntity();
+        mailEntity.setSize(33996852348L);
+        System.out.println(mailEntity.getSizeStr());
+
+    }
+
 }
