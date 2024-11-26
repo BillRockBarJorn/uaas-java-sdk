@@ -295,6 +295,7 @@ public class EicsUtils {
         List<Bucket> ans = new ArrayList<>();
         for (Bucket bucket : bucketList.getBuckets()) {
             log.info("桶详细信息如下:" + bucket.toString());
+            bucket = hos.getBucketInfo(bucket.getBucketName());
             if (bucket.getBytesUsed() == 0
                     && (System.currentTimeMillis() - bucket.getCreationDate().getTime()) > (1000 * 60 * 60 * 24 * (expirationDays + 1))) {
                 // 该分支表示，桶使用大小为0，并且已经过期，就进行删除桶操作
@@ -315,7 +316,7 @@ public class EicsUtils {
             } else {
                 ans.add(hos.getBucketInfo(bucket.getBucketName()));
             }
-            ans.add(hos.getBucketInfo(bucket.getBucketName()));
+//            ans.add(hos.getBucketInfo(bucket.getBucketName()));
         }
         return ans;
     }
