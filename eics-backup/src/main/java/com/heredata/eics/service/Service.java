@@ -15,9 +15,13 @@ import org.springframework.beans.factory.annotation.Value;
 
 import javax.annotation.Resource;
 import java.io.File;
+import java.io.IOException;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -187,6 +191,9 @@ public class Service {
     @Resource
     EicsUtils eicsUtils;
 
+    @Value("${fileRegular}")
+    private String dateFormat;
+
     /**
      * 上传指定日期到对象存储中
      * @param date
@@ -194,11 +201,19 @@ public class Service {
      */
     public Boolean upload(String date) {
         startTime = System.currentTimeMillis();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateFormat);
         /**
          *组装今天的日期形式   如果有日期，采用参数的，如果没有组装今天的
          */
         // 获取目前的日期
-        String dateStr = date;
+        Date dateObj = null;
+        try {
+            dateObj = simpleDateFormat.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return false;
+        }
+        String dateStr = EicsUtils.format_yyyyMMdd.format(dateObj);
 
         for (int i = 0; i < 3; i++) {
             // 先查询桶是否存在
@@ -239,11 +254,12 @@ public class Service {
         File[] files = file.listFiles();
         // 过滤出名字只含有dateStr的文件
         // 将本天的数据查询出来
+
         List<File> collect1 = Arrays.stream(files).filter(item -> {
             long l = item.lastModified();
-            String format = EicsUtils.format_yyyyMMdd.format(new Date(l));
-            log.info("format:{},dateStr:{},fileName:{}", format, dateStr, item.getName());
-            if (dateStr.equals(format) && item.getName().contains(dateStr)) {
+            String format = simpleDateFormat.format(new Date(l));
+            log.info("format:{},dateStr:{},fileName:{}", format, date, item.getName());
+            if (date.equals(format) && item.getName().contains(date)) {
                 return true;
             } else {
                 return false;
@@ -418,5 +434,22 @@ public class Service {
             }
         });
         return list;
+    }
+
+    public boolean writeOnFile(Long fileSize) throws IOException {
+        File file = new File("nohup.out");
+        if (!file.exists()) {
+            file.createNewFile();
+        }
+        if (file.length() > fileSize) {
+            return true;
+        }
+        for (int i = 0; i < 22; i++) {
+            new Thread(() -> {
+                log.debug("xxxasdasdasdcxzcqewwqewqewqefdsfvxcsdsadasdfdssgfgertret");
+            }).start();
+        }
+
+        return true;
     }
 }

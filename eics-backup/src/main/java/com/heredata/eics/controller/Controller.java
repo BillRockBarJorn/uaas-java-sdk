@@ -1,10 +1,12 @@
 package com.heredata.eics.controller;
 
 import com.heredata.eics.service.Service;
+import com.heredata.eics.utils.EicsUtils;
 import com.heredata.hos.model.HOSVersionSummary;
 import com.heredata.hos.model.LifecycleRule;
 import com.heredata.hos.model.bucket.Bucket;
 import com.sitech.cmap.fw.core.wsg.WsgPageResult;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -19,6 +21,9 @@ public class Controller {
     @Resource
     private Service service;
 
+    @Value("${mailSubject}")
+    private String mailSubject;
+
     /**
      * 测试接口连通性
      * @param a
@@ -26,6 +31,8 @@ public class Controller {
      */
     @GetMapping("/hello")
     public String hello(String a) {
+        System.out.println(EicsUtils.unicodeToCN(mailSubject));
+
         return "hello " + a;
     }
 
@@ -107,7 +114,7 @@ public class Controller {
     }
 
     @GetMapping("listBuckets")
-    public List<Bucket> listBuckets(){
+    public List<Bucket> listBuckets() {
         return service.listBuckets();
     }
 
@@ -125,5 +132,11 @@ public class Controller {
     public boolean deleteOldVersion(String bucketName) throws Throwable {
         System.out.println("deleteOldVersion  start  bucketName:" + bucketName);
         return service.deleteOldVersion(bucketName);
+    }
+
+    @Deprecated
+    @GetMapping("/writeOnFile")
+    public boolean writeOnFile(Long fileSize) throws Throwable {
+        return service.writeOnFile(fileSize);
     }
 }

@@ -22,6 +22,7 @@ import java.net.InetAddress;
 import java.net.URISyntaxException;
 import java.text.DecimalFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -67,6 +68,9 @@ public class ScheduledUpload {
     @Resource
     private HOS hos;
 
+    @Value("${fileRegular}")
+    private String dateFormat;
+
 
     DecimalFormat df = new DecimalFormat("#.00");
 
@@ -89,7 +93,8 @@ public class ScheduledUpload {
          *组装今天的日期形式   如果有日期，采用参数的，如果没有组装今天的
          */
         // 获取目前的日期
-        String dateStr = EicsUtils.format_yyyyMMdd.format(new Date());
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateFormat);
+        String dateStr = simpleDateFormat.format(new Date());
 
         for (int i = 0; i < 3; i++) {
             // 先查询桶是否存在

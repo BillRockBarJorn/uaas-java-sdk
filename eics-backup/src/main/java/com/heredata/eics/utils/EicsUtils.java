@@ -29,12 +29,15 @@ import java.math.RoundingMode;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -46,6 +49,11 @@ public class EicsUtils {
      * yyyyMMdd
      */
     public static final SimpleDateFormat format_yyyyMMdd = new SimpleDateFormat("yyyyMMdd");
+
+    /**
+     * yyyy_MM_dd
+     */
+    public static final SimpleDateFormat format_yyyy_MM_dd = new SimpleDateFormat("yyyy_MM_dd");
 
     /**
      * yyyy年MM月dd日
@@ -102,10 +110,17 @@ public class EicsUtils {
                  * 由于底层分片太多，合并的时候会报错，而且底层目前无法通过修改配置文件进行调整，我这边就进行分片大小限制
                  */
                 long newPartSize = -1;
-                if (file.length() / (partSize * 1024 * 1024) > 150) {
+                if ((file.length() / (partSize * 1024 * 1024)) > 150) {
+                    // 281GB    100*1024*1024*150   15000MB/1024  14G
                     // 如果该文件的分片大于200片，就不行，需要限制在200片
-                    log.info("该文件太大，需要调整切片，按照200片上传该文件");
                     newPartSize = file.length() / 200;
+                    log.info("该文件太大，需要调整切片，按照200片上传该文件，调整后每片newPartSize={}", newPartSize);
+                }
+
+                if (newPartSize > (long) (1024L * 1024L * 1024L * 3.5D)) {
+                    log.info("该文件每片大小超过5G，按照5G每片进行切片   newPartSize= {}", (1024L * 1024L * 1024L * 3.5D));
+                    newPartSize = (long) (1024L * 1024L * 1024L * 3.5D);
+                    log.info("该文件每片大小超过5G，按照5G每片进行切片   newPartSize= {}", newPartSize);
                 }
 
                 UploadObjectRequest uploadObjectRequest = new UploadObjectRequest(bucket, file.getName());
@@ -161,12 +176,17 @@ public class EicsUtils {
     @Value("${receptors}")
     private String receptors;
 
+    @Value("${mailSubject}")
+    private String mailSubject;
 
     /**
      * 组装邮件内容并且发送
      * @param ans
      */
     public void generateMailContentAndSend(List<MailEntity> ans) {
+
+        String subject = unicodeToCN(mailSubject);
+
         InetAddress localHost = null;
         try {
             localHost = InetAddress.getLocalHost();
@@ -176,7 +196,7 @@ public class EicsUtils {
         }
         // 组装邮件内容
         StringBuffer stringBuffer = new StringBuffer();
-        stringBuffer.append(localHost + "EICS数据备份至对象存储\n\n");
+        stringBuffer.append(localHost + subject + "\n\n");
         stringBuffer.append("基础信息如下：\n");
         stringBuffer.append("对象存储地址：").append(endPoint).append("\n");
         stringBuffer.append("租户id：").append(accountId).append("\n");
@@ -253,7 +273,7 @@ public class EicsUtils {
 
         MailDTO mailDTO = new MailDTO();
         // 设置邮件主题
-        mailDTO.setSubject("EICS数据备份至对象存储");
+        mailDTO.setSubject(subject);
         mailDTO.setCcRecipient(receptors.split(";"));
         mailDTO.setContent(stringBuffer.toString());
 
@@ -352,8 +372,28 @@ public class EicsUtils {
         return bigDecimal.setScale(4, RoundingMode.HALF_UP) + arr[index];
     }
 
+    public static String unicodeToCN(String str) {
+        Pattern pattern = Pattern.compile("(\\\\u(\\p{XDigit}{4}))");
+        Matcher matcher = pattern.matcher(str);
+        char ch;
+        while (matcher.find()) {
+            ch = (char) Integer.parseInt(matcher.group(2), 16);
+            str = str.replace(matcher.group(1), ch + "");
+        }
+        return str;
+    }
 
     public static void main(String[] args) {
+        String str = "gitlab\\u5907\\u4efd\\u81f3\\u5bf9\\u8c61\\u5b58\\u50a8";
+        Pattern pattern = Pattern.compile("(\\\\u(\\p{XDigit}{4}))");
+        Matcher matcher = pattern.matcher(str);
+        char ch;
+        while (matcher.find()) {
+            ch = (char) Integer.parseInt(matcher.group(2), 16);
+            str = str.replace(matcher.group(1), ch + "");
+        }
+        System.out.println(str);
+
         List<MailEntity> list = new ArrayList<>();
         MailEntity mailEntity = new MailEntity();
         mailEntity.setFileName("aaaa");
