@@ -188,7 +188,7 @@ public class AccountTest extends TestBase {
 
         HOS hos = getHOSClient();
         // 创建账户配额请求对象并设置配额数量
-        SetAccountQuotaRequest setAccountQuotaRequest = new SetAccountQuotaRequest(0L);
+        SetAccountQuotaRequest setAccountQuotaRequest = new SetAccountQuotaRequest(1024 * 1024 * 1024*100L, 100L);
         try {
             VoidResult voidResult = hos.setAccountQuota(setAccountQuotaRequest);
             if (voidResult.getResponse().isSuccessful()) {

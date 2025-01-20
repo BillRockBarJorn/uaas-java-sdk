@@ -11,6 +11,9 @@ import org.junit.Test;
 
 import javax.activation.MimetypesFileTypeMap;
 import java.io.*;
+import java.math.BigDecimal;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -24,14 +27,19 @@ public class ObjectTest extends TestBase {
 
 
     @Test
-    public void test222() {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        try {
-            Date parse = simpleDateFormat.parse("2023-07-08 ");
-            System.out.println(parse);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+    public void test222() throws MalformedURLException {
+        double aaa = 99999999999D;
+        String s = "9.9999999999E10";
+        Double aDouble = Double.valueOf(s);
+        System.out.println(153931627888640D);
+
+//        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//        try {
+//            Date parse = simpleDateFormat.parse("2023-07-08 ");
+//            System.out.println(parse);
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//        }
     }
 
     @Test
@@ -81,25 +89,31 @@ public class ObjectTest extends TestBase {
 //        objectMetadata.getUserMetadata().put("meta1", "I am meta1");
 //        objectMetadata.getUserMetadata().put("meta2", "I am meta2");
 //        objectMetadata.getUserMetadata().put("meta3", "I am meta3");
-        objectMetadata.getUserMetadata().put("example", "txt1");
-        objectMetadata.getUserMetadata().put("example2", "txt2");
+//        objectMetadata.getUserMetadata().put("example", "txt1");
+//        objectMetadata.getUserMetadata().put("example2", "txt2");
 
-
-        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(new byte[]{97, 98, 99, 100});
-//        /opdb/docfile/17853/6FA4982D58B14653B2B1370BB7D132BB/123321.docx
-        PutObjectRequest putObjectRequest = new PutObjectRequest("ncoss-4",
-                "a/b/c/d"
-                , byteArrayInputStream, objectMetadata);
-
-//        PutObjectRequest putObjectRequest = new PutObjectRequest("jssdk",
-//                "2023/04/20/软负载安装.zip"
-//                , new FileInputStream("E:\\比洛巴乔\\Desktop\\fsdownload\\软负载安装.zip"), null);
         try {
+            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(new byte[]{97, 98, 99, 100});
+            PutObjectRequest putObjectRequest = new PutObjectRequest("bt02",
+                    "a/defdg.txt", byteArrayInputStream, objectMetadata);
             PutObjectResult example = hos.putObject(putObjectRequest);
-            if (example.getResponse().isSuccessful()) {
-                System.out.println(example);
-                System.out.println("上传成功");
-            }
+
+//            for (int i = 0; i < 100; i++) {
+//                ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(new byte[]{97, 98, 99, 100});
+////        /opdb/docfile/17853/6FA4982D58B14653B2B1370BB7D132BB/123321.docx
+//                PutObjectRequest putObjectRequest = new PutObjectRequest("bucket1",
+//                        "a/" + i + ".txt"
+//                        , byteArrayInputStream, objectMetadata);
+//
+////        PutObjectRequest putObjectRequest = new PutObjectRequest("jssdk",
+////                "2023/04/20/软负载安装.zip"
+////                , new FileInputStream("E:\\比洛巴乔\\Desktop\\fsdownload\\软负载安装.zip"), null);
+//                PutObjectResult example = hos.putObject(putObjectRequest);
+//                if (example.getResponse().isSuccessful()) {
+//                    System.out.println(example);
+//                    System.out.println("上传成功");
+//                }
+//            }
         } catch (ServiceException oe) {
             System.out.println("Error Code:" + oe.getErrorCode());
             System.out.println("Request ID:" + oe.getRequestId());
@@ -177,13 +191,14 @@ public class ObjectTest extends TestBase {
         try {
             // 下一页的起点
             String nextStartAfter = null;
+            String versionId=null;
             // 查询结果对象
             VersionListing versionListing;
             do {
                 System.out.println("====================第 " + index + " 页======================");
                 // 构建请求参数并查询
-                versionListing = hos.listVersions(new ListVersionsRequest().withBucketName("ncoss-4")
-                        .withStartAfter(nextStartAfter).withMaxKeys(2));
+                versionListing = hos.listVersions(new ListVersionsRequest().withBucketName("bucket1")
+                        .withStartAfter(nextStartAfter).withMaxKeys(2).withVersionIdMarker(versionId));
 
                 // 打印结果
                 List<HOSVersionSummary> sums = versionListing.getVersionSummaries();
@@ -192,6 +207,7 @@ public class ObjectTest extends TestBase {
                 }
                 // 获取nextStartAfter
                 nextStartAfter = versionListing.getNextStartAfter();
+                versionId=versionListing.getNextVersionIdMarker();
                 index++;
             } while (versionListing.isTruncated());
         } catch (ServiceException oe) {
@@ -216,7 +232,7 @@ public class ObjectTest extends TestBase {
         HOS hos = getHOSClient();
         try {
             // 创建请求对象
-            VersionListing example = hos.listVersions(new ListVersionsRequest().withBucketName("ncoss-4"));
+            VersionListing example = hos.listVersions(new ListVersionsRequest().withBucketName("bucket1"));
             example.getVersionSummaries().stream().forEach(item -> System.out.println(item));
             System.out.println("================================");
 
@@ -258,7 +274,7 @@ public class ObjectTest extends TestBase {
             do {
                 System.out.println("============第 " + index + " 页=================");
                 // 构建请求参数并查询
-                objectListing = hos.listObjects(new ListObjectsRequest("test_Hss2")
+                objectListing = hos.listObjects(new ListObjectsRequest("bucket1")
                         .withStartAfter(nextStartAfter).withMaxKeys(2));
 
                 // 打印结果
@@ -458,9 +474,9 @@ public class ObjectTest extends TestBase {
     public void deleteObject() {
         HOS hos = getHOSClient();
         try {
-            DeleteObjectsRequest deleteObjectsRequest = new DeleteObjectsRequest("ncoss-4");
-            deleteObjectsRequest.setVersionId("3e34fac4425a11eeb3a4fa163e2fcf06");
-            deleteObjectsRequest.setKey("a/b/c/d");
+            DeleteObjectsRequest deleteObjectsRequest = new DeleteObjectsRequest("bucket1");
+//            deleteObjectsRequest.setVersionId("3e34fac4425a11eeb3a4fa163e2fcf06");
+            deleteObjectsRequest.setKey("a/b/c/ddcc");
             hos.deleteObject(deleteObjectsRequest);
         } catch (ServiceException oe) {
             System.out.println("Error Message:" + oe.getErrorMessage());

@@ -30,8 +30,42 @@ public class BucketTest extends TestBase {
         HOS hos = getHOSClient();
         try {
             // 创建请求对象，并且设置创建桶名为"example"的桶
-            CreateBucketRequest createBucketRequest = new CreateBucketRequest("ncoss-3");
+            CreateBucketRequest createBucketRequest = new CreateBucketRequest("ncossndfcbv-bvcvbbvc");
             VoidResult result = hos.createBucket(createBucketRequest);
+
+            createBucketRequest = new CreateBucketRequest("ncosjhgjfdgsdf-bv");
+            hos.createBucket(createBucketRequest);
+
+            createBucketRequest = new CreateBucketRequest("ncos645654sdf-bv");
+            hos.createBucket(createBucketRequest);
+
+            createBucketRequest = new CreateBucketRequest("ncosxzczadsdf-bv");
+            hos.createBucket(createBucketRequest);
+
+            createBucketRequest = new CreateBucketRequest("ncosduyretsdf-bv");
+            hos.createBucket(createBucketRequest);
+
+            createBucketRequest = new CreateBucketRequest("ncoss546df-bv");
+            hos.createBucket(createBucketRequest);
+
+            createBucketRequest = new CreateBucketRequest("ncosasdsdf-bv");
+            hos.createBucket(createBucketRequest);
+
+            createBucketRequest = new CreateBucketRequest("ncosxzcsdf-bv");
+            hos.createBucket(createBucketRequest);
+
+            createBucketRequest = new CreateBucketRequest("ncosfdgsdf-bv");
+            hos.createBucket(createBucketRequest);
+
+            createBucketRequest = new CreateBucketRequest("nco213ssdf-bv");
+            hos.createBucket(createBucketRequest);
+
+            createBucketRequest = new CreateBucketRequest("ncossqwedf-bv");
+            hos.createBucket(createBucketRequest);
+
+            createBucketRequest = new CreateBucketRequest("ncossbfbdf-bv");
+            hos.createBucket(createBucketRequest);
+
             if (result.getResponse().isSuccessful()) {
                 System.out.println("创建成功");
             }
@@ -56,12 +90,12 @@ public class BucketTest extends TestBase {
     public void getBucketDetail() {
         HOS hos = getHOSClient();
         try {
-            if (hos.doesBucketExist("ncoss-3")) {
+            if (hos.doesBucketExist("bucket1")) {
 
                 //查询桶名为"example"的详情
-                Bucket bucket = hos.getBucketInfo("ncoss-3");
+                Bucket bucket = hos.getBucketInfo("bucket1");
                 System.out.println(bucket);
-            }else{
+            } else {
                 System.out.println("桶不存在");
             }
         } catch (ServiceException oe) {
