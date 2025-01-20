@@ -2,7 +2,6 @@ package com.heredata.utils;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
-import org.bouncycastle.jcajce.provider.digest.SHA256;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;

@@ -46,9 +46,14 @@ public final class RequestMarshallers {
         @Override
         public byte[] marshall(SetAccountQuotaRequest request) {
             StringBuffer xmlBody = new StringBuffer();
-            xmlBody.append("<QuotaConfiguration><StorageQuota>");
+            xmlBody.append("<QuotaConfiguration>");
+            xmlBody.append("<StorageQuota>");
             xmlBody.append(request.getAccountQuota());
-            xmlBody.append("</StorageQuota></QuotaConfiguration>");
+            xmlBody.append("</StorageQuota>");
+            xmlBody.append("<StorageMaxCount>");
+            xmlBody.append(request.getStorageMaxCount());
+            xmlBody.append("</StorageMaxCount>");
+            xmlBody.append("</QuotaConfiguration>");
             return stringToByteArray(xmlBody.toString());
         }
     }

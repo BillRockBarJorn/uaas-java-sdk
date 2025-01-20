@@ -2,6 +2,7 @@ package com.heredata.hos.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * <p>Title: SetAccountQuotaRequest</p>
@@ -14,6 +15,7 @@ import lombok.Data;
  */
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class SetAccountQuotaRequest extends GenericRequest {
     /**
      * 账户配额值必须为非负整数。
@@ -22,4 +24,9 @@ public class SetAccountQuotaRequest extends GenericRequest {
      * 单位：Byte
      */
     private Long accountQuota;
+
+    private Long storageMaxCount;
+
+
+
 }

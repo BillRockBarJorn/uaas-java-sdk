@@ -18,6 +18,7 @@ import com.heredata.hos.model.bucket.BucketVersioningConfiguration;
 import com.heredata.model.VoidResult;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashMap;
@@ -572,16 +573,13 @@ public class HOSBucketOperation extends HOSOperation {
 
         params.put(SUBRESOURCE_VRESIONS, null);
 
-        try {
-            if (listVersionsRequest.getPrefix() != null) {
-                params.put(PREFIX, URLEncoder.encode(listVersionsRequest.getPrefix(), DEFAULT_ENCODING));
-            }
+        if (listVersionsRequest.getPrefix() != null) {
+            params.put(PREFIX, urlEncodeKey(listVersionsRequest.getPrefix()));
+        }
 
-            if (listVersionsRequest.getStartAfter() != null) {
-                params.put(KEY_MARKER, URLEncoder.encode(listVersionsRequest.getStartAfter(), DEFAULT_ENCODING));
-            }
-        } catch (UnsupportedEncodingException exception) {
-            exception.printStackTrace();
+        if (listVersionsRequest.getStartAfter() != null) {
+            params.put(KEY_MARKER, urlEncodeKey(listVersionsRequest.getStartAfter()));
+//            params.put(LIST_TYPE, "2");
         }
 
         if (listVersionsRequest.getMaxKeys() != null) {
