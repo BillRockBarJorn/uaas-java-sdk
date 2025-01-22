@@ -24,18 +24,6 @@ public class Controller {
     @Value("${mailSubject}")
     private String mailSubject;
 
-    /**
-     * 测试接口连通性
-     * @param a
-     * @return
-     */
-    @GetMapping("/hello")
-    public String hello(String a) {
-        System.out.println(EicsUtils.unicodeToCN(mailSubject));
-
-        return "hello " + a;
-    }
-
     @GetMapping("/listObject")
     public String objectList(@RequestParam(required = false) String fileName
             , @RequestParam(required = false) String startTime
@@ -132,11 +120,5 @@ public class Controller {
     public boolean deleteOldVersion(String bucketName) throws Throwable {
         System.out.println("deleteOldVersion  start  bucketName:" + bucketName);
         return service.deleteOldVersion(bucketName);
-    }
-
-    @Deprecated
-    @GetMapping("/writeOnFile")
-    public boolean writeOnFile(Long fileSize) throws Throwable {
-        return service.writeOnFile(fileSize);
     }
 }

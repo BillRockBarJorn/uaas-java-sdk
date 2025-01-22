@@ -182,9 +182,13 @@ public class HOSRequestMessageBuilder {
         request.setKey(key);
         request.setEndpoint(determineFinalEndpoint(this.endpoint, this.bucket, clientCofig));
         String resourcePath = null;
-        if ("HOS_null".equals(this.account))
+        if ("HOS_null".equals(this.account)){
+            // 走对象存储4的底层
             resourcePath = determineResourcePath(this.bucket, this.key, clientCofig.isSLDEnabled());
-        else resourcePath = determineResourcePath(this.account, this.bucket, this.key, clientCofig.isSLDEnabled());
+        } else{
+            // 走对象存储3的底层
+            resourcePath = determineResourcePath(this.account, this.bucket, this.key, clientCofig.isSLDEnabled());
+        }
         request.setResourcePath(resourcePath);
         request.setHeaders(sentHeaders);
         request.setParameters(sentParameters);

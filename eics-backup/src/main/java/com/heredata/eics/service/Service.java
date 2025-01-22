@@ -435,21 +435,4 @@ public class Service {
         });
         return list;
     }
-
-    public boolean writeOnFile(Long fileSize) throws IOException {
-        File file = new File("nohup.out");
-        if (!file.exists()) {
-            file.createNewFile();
-        }
-        if (file.length() > fileSize) {
-            return true;
-        }
-        for (int i = 0; i < 22; i++) {
-            new Thread(() -> {
-                log.debug("xxxasdasdasdcxzcqewwqewqewqefdsfvxcsdsadasdfdssgfgertret");
-            }).start();
-        }
-
-        return true;
-    }
 }
