@@ -22,7 +22,7 @@
  */
 var {s3Client,s3ClientV4} = require('./getS3Client')
 
-s3ClientV4.bucketExists('nodejee', function(err, exists) {
+s3Client.bucketExists('buckxzczxcxzczxsdaaet2', function(err, exists) {
   if (err) {
     return console.log(exists)
   }
